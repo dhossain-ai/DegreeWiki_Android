@@ -11,10 +11,14 @@ android {
     compileSdk = 36
     defaultConfig {
         applicationId = "com.example.degreewiki"
-        minSdk = 24
+        minSdk = 26
         targetSdk = 36
         versionCode = 1
         versionName = "1.0"
+
+        // Auth placeholders — override via local.properties or CI env vars
+        buildConfigField("String", "SUPABASE_URL", "\"PLACEHOLDER\"")
+        buildConfigField("String", "SUPABASE_ANON_KEY", "\"PLACEHOLDER\"")
     }
 
     buildTypes {
@@ -30,7 +34,7 @@ android {
     buildFeatures {
       compose = true
       aidl = false
-      buildConfig = false
+      buildConfig = true
       shaders = false
     }
 
@@ -63,6 +67,7 @@ dependencies {
   implementation(libs.androidx.compose.ui)
   implementation(libs.androidx.compose.ui.tooling.preview)
   implementation(libs.androidx.compose.material3)
+  implementation(libs.androidx.compose.material.icons.extended)
   // Tooling
   debugImplementation(libs.androidx.compose.ui.tooling)
   // Instrumented tests
@@ -100,4 +105,15 @@ dependencies {
   implementation(libs.okhttp)
   implementation(libs.okhttp.logging.interceptor)
   implementation(libs.kotlinx.serialization.json)
+
+  // Supabase Auth
+  implementation(platform(libs.supabase.bom))
+  implementation(libs.supabase.auth.kt)
+
+  // Ktor engine (required by Supabase client)
+  implementation(libs.ktor.client.android)
+
+  // Encrypted session storage
+  implementation(libs.androidx.security.crypto)
 }
+

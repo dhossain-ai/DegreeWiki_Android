@@ -15,4 +15,11 @@ abstract class RepositoryModule {
     abstract fun bindDataRepository(
         defaultDataRepository: DefaultDataRepository
     ): DataRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindAuthRepository(
+        defaultAuthRepository: DefaultAuthRepository
+    ): AuthRepository
 }
+
