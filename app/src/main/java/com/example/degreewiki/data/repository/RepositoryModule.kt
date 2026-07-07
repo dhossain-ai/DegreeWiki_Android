@@ -21,5 +21,11 @@ abstract class RepositoryModule {
     abstract fun bindAuthRepository(
         defaultAuthRepository: DefaultAuthRepository
     ): AuthRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindProfileRepository(
+        defaultProfileRepository: DefaultProfileRepository
+    ): ProfileRepository
 }
 
