@@ -42,4 +42,7 @@ interface DegreeWikiApiService {
         @Query("q") query: String?,
         @Query("page") page: Int?
     ): ProgramSearchResponse
+
+    @GET("api/mobile/programs")
+    suspend fun getPrograms(): List<com.example.degreewiki.data.network.dto.ProgramDto>
 }
