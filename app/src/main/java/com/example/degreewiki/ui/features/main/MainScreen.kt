@@ -5,7 +5,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -22,6 +21,7 @@ import com.example.degreewiki.ui.features.auth.LoginScreen
 import com.example.degreewiki.ui.features.discover.CountriesScreen
 import com.example.degreewiki.ui.features.discover.ProgramsScreen
 import com.example.degreewiki.ui.features.discover.UniversitiesScreen
+import com.example.degreewiki.ui.features.profile.ProfileScreen
 
 @Composable
 fun MainScreen(
@@ -56,9 +56,7 @@ fun MainScreen(
                         LoginScreen(modifier = Modifier.padding(innerPadding))
                     }
                     is AuthState.Authenticated -> {
-                        Box(modifier = Modifier.fillMaxSize().padding(innerPadding), contentAlignment = Alignment.Center) {
-                            Text("Authenticated User Profile")
-                        }
+                        ProfileScreen(modifier = Modifier.padding(innerPadding))
                     }
                 }
             }
