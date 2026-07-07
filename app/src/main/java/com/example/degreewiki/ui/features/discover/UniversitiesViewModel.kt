@@ -20,7 +20,7 @@ class UniversitiesViewModel @Inject constructor(
 
     val uiState: StateFlow<DiscoveryUiState<University>> =
         dataRepository.universities
-            .map<List<University>, DiscoveryUiState<University>>(DiscoveryUiState::Success)
+            .map { DiscoveryUiState.Success(it) as DiscoveryUiState<University> }
             .catch { emit(DiscoveryUiState.Error(it)) }
             .stateIn(
                 scope = viewModelScope,

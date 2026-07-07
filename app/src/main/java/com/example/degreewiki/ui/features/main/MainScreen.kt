@@ -1,51 +1,38 @@
 package com.example.degreewiki.ui.features.main
 
-import androidx.compose.foundation.layout.Column
-import androidx.compose.material3.Text
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
-import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation3.runtime.NavKey
-import com.example.degreewiki.domain.model.Program
-import com.example.degreewiki.ui.theme.DegreeWikiTheme
+import com.example.degreewiki.ui.features.discover.CountriesScreen
+import com.example.degreewiki.ui.features.discover.ProgramsScreen
+import com.example.degreewiki.ui.features.discover.UniversitiesScreen
 
 @Composable
 fun MainScreen(
     onItemClick: (NavKey) -> Unit,
-    modifier: Modifier = Modifier,
-    viewModel: MainScreenViewModel = hiltViewModel(),
+    modifier: Modifier = Modifier
 ) {
-    val state by viewModel.uiState.collectAsStateWithLifecycle()
-    when (state) {
-        MainScreenUiState.Loading -> {
-            // Blank
-        }
-        is MainScreenUiState.Success -> {
-            MainScreen(data = (state as MainScreenUiState.Success).data, modifier = modifier)
-        }
-        is MainScreenUiState.Error -> {
-            Text("Error loading data: ${(state as MainScreenUiState.Error).throwable.message}")
+    var currentTab by rememberSaveable { mutableStateOf(DiscoveryTab.PROGRAMS) }
+
+    Scaffold(
+        bottomBar = {
+            BottomNavigationBar(
+                currentTab = currentTab,
+                onTabSelected = { currentTab = it }
+            )
+        },
+        modifier = modifier
+    ) { innerPadding ->
+        when (currentTab) {
+            DiscoveryTab.PROGRAMS -> ProgramsScreen(modifier = Modifier.padding(innerPadding))
+            DiscoveryTab.UNIVERSITIES -> UniversitiesScreen(modifier = Modifier.padding(innerPadding))
+            DiscoveryTab.COUNTRIES -> CountriesScreen(modifier = Modifier.padding(innerPadding))
         }
     }
-}
-
-@Composable
-internal fun MainScreen(data: List<Program>, modifier: Modifier = Modifier) {
-    Column(modifier) {
-        data.forEach { Greeting(it.title) }
-    }
-}
-
-@Composable
-fun Greeting(name: String, modifier: Modifier = Modifier) {
-    Text(text = "Hello $name!", modifier = modifier)
-}
-
-@Preview(showBackground = true)
-@Composable
-fun MainScreenPreview() {
-    DegreeWikiTheme { MainScreen(emptyList()) }
 }
