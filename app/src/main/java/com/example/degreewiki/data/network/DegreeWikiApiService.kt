@@ -45,4 +45,10 @@ interface DegreeWikiApiService {
 
     @GET("api/mobile/programs")
     suspend fun getPrograms(): List<com.example.degreewiki.data.network.dto.ProgramDto>
+
+    @GET("api/mobile/countries")
+    suspend fun getCountries(): List<com.example.degreewiki.data.network.dto.CountryDto>
+
+    @GET("api/mobile/universities")
+    suspend fun getUniversities(): List<com.example.degreewiki.data.network.dto.UniversityDto>
 }
