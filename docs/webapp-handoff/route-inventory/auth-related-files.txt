@@ -1,0 +1,6 @@
+src/lib/auth/redirect.ts
+src/lib/auth/dashboard.ts
+src/pages/login.astro
+src/pages/signup.astro
+src/pages/auth/callback.astro
+src/pages/api/auth/logout.ts
