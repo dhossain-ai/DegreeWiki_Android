@@ -9,6 +9,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation3.runtime.NavKey
+import com.example.degreewiki.domain.model.Program
 import com.example.degreewiki.ui.theme.DegreeWikiTheme
 
 @Composable
@@ -32,9 +33,9 @@ fun MainScreen(
 }
 
 @Composable
-internal fun MainScreen(data: List<String>, modifier: Modifier = Modifier) {
+internal fun MainScreen(data: List<Program>, modifier: Modifier = Modifier) {
     Column(modifier) {
-        data.forEach { Greeting(it) }
+        data.forEach { Greeting(it.title) }
     }
 }
 
@@ -46,5 +47,5 @@ fun Greeting(name: String, modifier: Modifier = Modifier) {
 @Preview(showBackground = true)
 @Composable
 fun MainScreenPreview() {
-    DegreeWikiTheme { MainScreen(listOf("Android")) }
+    DegreeWikiTheme { MainScreen(emptyList()) }
 }
