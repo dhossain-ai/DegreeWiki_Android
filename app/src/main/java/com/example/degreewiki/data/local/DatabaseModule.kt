@@ -32,4 +32,16 @@ object DatabaseModule {
     fun provideSavedItemDao(database: DegreeWikiDatabase): SavedItemDao {
         return database.savedItemDao()
     }
+
+    @Provides
+    @Singleton
+    fun provideCountryDao(database: DegreeWikiDatabase) = database.countryDao()
+
+    @Provides
+    @Singleton
+    fun provideUniversityDao(database: DegreeWikiDatabase) = database.universityDao()
+
+    @Provides
+    @Singleton
+    fun provideProgramDao(database: DegreeWikiDatabase) = database.programDao()
 }
