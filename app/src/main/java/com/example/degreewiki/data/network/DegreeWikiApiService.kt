@@ -51,4 +51,13 @@ interface DegreeWikiApiService {
 
     @GET("api/mobile/universities")
     suspend fun getUniversities(): List<com.example.degreewiki.data.network.dto.UniversityDto>
+
+    @GET("api/mobile/me")
+    suspend fun getProfile(): com.example.degreewiki.data.network.dto.UserProfileDto
+
+    @GET("api/mobile/me/saved-items")
+    suspend fun getSavedItems(): List<com.example.degreewiki.data.network.dto.SavedItemDto>
+
+    @retrofit2.http.DELETE("api/mobile/me/saved-items/{id}")
+    suspend fun deleteSavedItem(@retrofit2.http.Path("id") id: String)
 }
