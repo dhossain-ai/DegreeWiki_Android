@@ -1,3 +1,6 @@
+import java.util.Properties
+import java.io.FileInputStream
+
 plugins {
   alias(libs.plugins.android.application)
   alias(libs.plugins.compose.compiler)
@@ -17,10 +20,10 @@ android {
         versionName = "1.0"
 
         // Secrets management via local.properties
-        val localProperties = java.util.Properties()
+        val localProperties = Properties()
         val localPropertiesFile = rootProject.file("local.properties")
         if (localPropertiesFile.exists()) {
-            localProperties.load(java.io.FileInputStream(localPropertiesFile))
+            localProperties.load(FileInputStream(localPropertiesFile))
         }
         val supabaseUrl = localProperties.getProperty("SUPABASE_URL") ?: "https://placeholder.supabase.co"
         val supabaseAnonKey = localProperties.getProperty("SUPABASE_ANON_KEY") ?: "PLACEHOLDER"
