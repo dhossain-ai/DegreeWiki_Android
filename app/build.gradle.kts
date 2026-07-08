@@ -16,9 +16,19 @@ android {
         versionCode = 1
         versionName = "1.0"
 
-        // Auth placeholders — override via local.properties or CI env vars
-        buildConfigField("String", "SUPABASE_URL", "\"PLACEHOLDER\"")
-        buildConfigField("String", "SUPABASE_ANON_KEY", "\"PLACEHOLDER\"")
+        // Secrets management via local.properties
+        val localProperties = java.util.Properties()
+        val localPropertiesFile = rootProject.file("local.properties")
+        if (localPropertiesFile.exists()) {
+            localProperties.load(java.io.FileInputStream(localPropertiesFile))
+        }
+        val supabaseUrl = localProperties.getProperty("SUPABASE_URL") ?: "PLACEHOLDER"
+        val supabaseAnonKey = localProperties.getProperty("SUPABASE_ANON_KEY") ?: "PLACEHOLDER"
+        val apiBaseUrl = localProperties.getProperty("API_BASE_URL") ?: "PLACEHOLDER"
+
+        buildConfigField("String", "SUPABASE_URL", "\"$supabaseUrl\"")
+        buildConfigField("String", "SUPABASE_ANON_KEY", "\"$supabaseAnonKey\"")
+        buildConfigField("String", "API_BASE_URL", "\"$apiBaseUrl\"")
     }
 
     buildTypes {
