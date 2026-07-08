@@ -21,6 +21,10 @@ interface DataRepository {
     val countries: Flow<List<Country>>
     val universities: Flow<List<University>>
     
+    fun getProgramById(id: String): Flow<Program?>
+    fun getCountryById(id: String): Flow<Country?>
+    fun getUniversityById(id: String): Flow<University?>
+    
     suspend fun refreshPrograms()
     suspend fun refreshCountries()
     suspend fun refreshUniversities()
@@ -45,6 +49,12 @@ class DefaultDataRepository @Inject constructor(
     override val universities: Flow<List<University>> = universityDao.getAllUniversities().map { entities ->
         entities.map { it.toDomain() }
     }
+
+    override fun getProgramById(id: String): Flow<Program?> = programDao.getProgramById(id).map { it?.toDomain() }
+
+    override fun getCountryById(id: String): Flow<Country?> = countryDao.getCountryById(id).map { it?.toDomain() }
+
+    override fun getUniversityById(id: String): Flow<University?> = universityDao.getUniversityById(id).map { it?.toDomain() }
 
     override suspend fun refreshPrograms() = withContext(Dispatchers.IO) {
         try {

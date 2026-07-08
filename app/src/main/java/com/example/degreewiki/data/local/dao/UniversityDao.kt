@@ -12,6 +12,9 @@ interface UniversityDao {
     @Query("SELECT * FROM universities")
     fun getAllUniversities(): Flow<List<UniversityEntity>>
 
+    @Query("SELECT * FROM universities WHERE id = :id")
+    fun getUniversityById(id: String): Flow<UniversityEntity?>
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertUniversities(universities: List<UniversityEntity>)
 

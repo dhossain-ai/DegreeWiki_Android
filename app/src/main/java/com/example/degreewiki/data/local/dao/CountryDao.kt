@@ -12,6 +12,9 @@ interface CountryDao {
     @Query("SELECT * FROM countries")
     fun getAllCountries(): Flow<List<CountryEntity>>
 
+    @Query("SELECT * FROM countries WHERE id = :id")
+    fun getCountryById(id: String): Flow<CountryEntity?>
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertCountries(countries: List<CountryEntity>)
     
