@@ -22,9 +22,9 @@ android {
         if (localPropertiesFile.exists()) {
             localProperties.load(java.io.FileInputStream(localPropertiesFile))
         }
-        val supabaseUrl = localProperties.getProperty("SUPABASE_URL") ?: "PLACEHOLDER"
+        val supabaseUrl = localProperties.getProperty("SUPABASE_URL") ?: "https://placeholder.supabase.co"
         val supabaseAnonKey = localProperties.getProperty("SUPABASE_ANON_KEY") ?: "PLACEHOLDER"
-        val apiBaseUrl = localProperties.getProperty("API_BASE_URL") ?: "PLACEHOLDER"
+        val apiBaseUrl = localProperties.getProperty("API_BASE_URL") ?: "https://placeholder.degreewiki.com/"
 
         buildConfigField("String", "SUPABASE_URL", "\"$supabaseUrl\"")
         buildConfigField("String", "SUPABASE_ANON_KEY", "\"$supabaseAnonKey\"")
