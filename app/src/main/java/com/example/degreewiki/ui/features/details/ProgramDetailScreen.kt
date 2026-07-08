@@ -23,7 +23,7 @@ fun ProgramDetailScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text(uiState.program?.name ?: "Program Details") },
+                title = { Text(uiState.program?.title ?: "Program Details") },
                 navigationIcon = {
                     IconButton(onClick = onBackClick) {
                         Icon(
@@ -63,30 +63,18 @@ fun ProgramDetailScreen(
                         verticalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
                         Text(
-                            text = program.name,
+                            text = program.title,
                             style = MaterialTheme.typography.headlineMedium
                         )
                         HorizontalDivider()
                         
-                        DetailRow(label = "University", value = program.universityId)
-                        DetailRow(label = "Country", value = program.countryId)
+                        DetailRow(label = "University", value = program.universityName)
+                        DetailRow(label = "Country", value = program.countryName)
                         DetailRow(label = "Degree Level", value = program.degreeLevel)
+                        program.subject?.let { DetailRow(label = "Subject", value = it) }
                         program.duration?.let { DetailRow(label = "Duration", value = it) }
-                        program.tuitionFee?.let { DetailRow(label = "Tuition Fee", value = "\$${it}") }
-                        program.language?.let { DetailRow(label = "Language", value = it) }
-                        program.format?.let { DetailRow(label = "Format", value = it) }
+                        program.tuition?.let { DetailRow(label = "Tuition Fee", value = "\$${it}") }
                     }
-                }
-                
-                program.description?.let {
-                    Text(
-                        text = "Description",
-                        style = MaterialTheme.typography.titleMedium
-                    )
-                    Text(
-                        text = it,
-                        style = MaterialTheme.typography.bodyMedium
-                    )
                 }
             }
         } else {

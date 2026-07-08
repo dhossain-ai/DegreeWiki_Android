@@ -66,25 +66,17 @@ fun CountryDetailScreen(
                             text = country.name,
                             style = MaterialTheme.typography.headlineMedium
                         )
-                        Text(
-                            text = country.code,
-                            style = MaterialTheme.typography.titleMedium,
-                            color = MaterialTheme.colorScheme.secondary
-                        )
                         
                         HorizontalDivider()
                         
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.SpaceBetween
-                        ) {
+                        country.summary?.let {
                             Text(
-                                text = "Region",
+                                text = "Summary",
                                 style = MaterialTheme.typography.bodyMedium,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
                             Text(
-                                text = country.region ?: "Unknown",
+                                text = it,
                                 style = MaterialTheme.typography.bodyLarge
                             )
                         }

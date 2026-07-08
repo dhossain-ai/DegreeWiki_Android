@@ -71,12 +71,18 @@ fun UniversityDetailScreen(
                             style = MaterialTheme.typography.titleMedium,
                             color = MaterialTheme.colorScheme.secondary
                         )
+                        university.city?.let {
+                            Text(
+                                text = it,
+                                style = MaterialTheme.typography.bodyMedium
+                            )
+                        }
                     }
                 }
                 
-                university.description?.let {
+                university.overview?.let {
                     Text(
-                        text = "Description",
+                        text = "Overview",
                         style = MaterialTheme.typography.titleMedium
                     )
                     Text(
