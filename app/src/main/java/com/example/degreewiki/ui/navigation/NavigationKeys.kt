@@ -9,3 +9,11 @@ data object Main : NavKey
 @Serializable
 data object Login : NavKey
 
+@Serializable
+data class ProgramDetail(val id: String) : NavKey
+
+@Serializable
+data class UniversityDetail(val id: String) : NavKey
+
+@Serializable
+data class CountryDetail(val id: String) : NavKey

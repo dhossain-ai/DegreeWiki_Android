@@ -26,6 +26,21 @@ fun MainNavigation() {
                         .padding(16.dp)
                 )
             }
+            entry<ProgramDetail> {
+                com.example.degreewiki.ui.features.details.ProgramDetailScreen(
+                    onBackClick = { backStack.removeLastOrNull() }
+                )
+            }
+            entry<UniversityDetail> {
+                com.example.degreewiki.ui.features.details.UniversityDetailScreen(
+                    onBackClick = { backStack.removeLastOrNull() }
+                )
+            }
+            entry<CountryDetail> {
+                com.example.degreewiki.ui.features.details.CountryDetailScreen(
+                    onBackClick = { backStack.removeLastOrNull() }
+                )
+            }
         }
     )
 }

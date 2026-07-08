@@ -16,6 +16,7 @@ import com.example.degreewiki.domain.model.Country
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CountriesScreen(
+    onItemClick: (String) -> Unit,
     viewModel: CountriesViewModel = hiltViewModel(),
     modifier: Modifier = Modifier
 ) {
@@ -72,7 +73,10 @@ fun CountriesScreen(
                             modifier = Modifier.fillMaxSize()
                         ) {
                             items(data, key = { it.id }) { country ->
-                                CountryCard(country = country)
+                                CountryCard(
+                                    country = country,
+                                    onClick = { onItemClick(country.id) }
+                                )
                             }
                         }
                     }
@@ -83,8 +87,9 @@ fun CountriesScreen(
 }
 
 @Composable
-fun CountryCard(country: Country, modifier: Modifier = Modifier) {
+fun CountryCard(country: Country, onClick: () -> Unit, modifier: Modifier = Modifier) {
     ElevatedCard(
+        onClick = onClick,
         modifier = modifier.fillMaxWidth()
     ) {
         Column(modifier = Modifier.padding(16.dp)) {

@@ -16,6 +16,7 @@ import com.example.degreewiki.domain.model.University
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun UniversitiesScreen(
+    onItemClick: (String) -> Unit,
     viewModel: UniversitiesViewModel = hiltViewModel(),
     modifier: Modifier = Modifier
 ) {
@@ -72,7 +73,10 @@ fun UniversitiesScreen(
                             modifier = Modifier.fillMaxSize()
                         ) {
                             items(data, key = { it.id }) { university ->
-                                UniversityCard(university = university)
+                                UniversityCard(
+                                    university = university,
+                                    onClick = { onItemClick(university.id) }
+                                )
                             }
                         }
                     }
@@ -83,8 +87,9 @@ fun UniversitiesScreen(
 }
 
 @Composable
-fun UniversityCard(university: University, modifier: Modifier = Modifier) {
+fun UniversityCard(university: University, onClick: () -> Unit, modifier: Modifier = Modifier) {
     ElevatedCard(
+        onClick = onClick,
         modifier = modifier.fillMaxWidth()
     ) {
         Column(modifier = Modifier.padding(16.dp)) {

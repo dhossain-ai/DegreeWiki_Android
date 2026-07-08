@@ -42,9 +42,18 @@ fun MainScreen(
         modifier = modifier
     ) { innerPadding ->
         when (currentTab) {
-            DiscoveryTab.PROGRAMS -> ProgramsScreen(modifier = Modifier.padding(innerPadding))
-            DiscoveryTab.UNIVERSITIES -> UniversitiesScreen(modifier = Modifier.padding(innerPadding))
-            DiscoveryTab.COUNTRIES -> CountriesScreen(modifier = Modifier.padding(innerPadding))
+            DiscoveryTab.PROGRAMS -> ProgramsScreen(
+                onItemClick = { id -> onItemClick(com.example.degreewiki.ui.navigation.ProgramDetail(id)) },
+                modifier = Modifier.padding(innerPadding)
+            )
+            DiscoveryTab.UNIVERSITIES -> UniversitiesScreen(
+                onItemClick = { id -> onItemClick(com.example.degreewiki.ui.navigation.UniversityDetail(id)) },
+                modifier = Modifier.padding(innerPadding)
+            )
+            DiscoveryTab.COUNTRIES -> CountriesScreen(
+                onItemClick = { id -> onItemClick(com.example.degreewiki.ui.navigation.CountryDetail(id)) },
+                modifier = Modifier.padding(innerPadding)
+            )
             DiscoveryTab.PROFILE -> {
                 when (authState) {
                     is AuthState.Loading -> {

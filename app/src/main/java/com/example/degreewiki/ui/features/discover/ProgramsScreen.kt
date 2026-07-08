@@ -16,6 +16,7 @@ import com.example.degreewiki.domain.model.Program
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ProgramsScreen(
+    onItemClick: (String) -> Unit,
     viewModel: ProgramsViewModel = hiltViewModel(),
     modifier: Modifier = Modifier
 ) {
@@ -72,7 +73,10 @@ fun ProgramsScreen(
                             modifier = Modifier.fillMaxSize()
                         ) {
                             items(data, key = { it.id }) { program ->
-                                ProgramCard(program = program)
+                                ProgramCard(
+                                    program = program,
+                                    onClick = { onItemClick(program.id) }
+                                )
                             }
                         }
                     }
@@ -83,8 +87,9 @@ fun ProgramsScreen(
 }
 
 @Composable
-fun ProgramCard(program: Program, modifier: Modifier = Modifier) {
+fun ProgramCard(program: Program, onClick: () -> Unit, modifier: Modifier = Modifier) {
     ElevatedCard(
+        onClick = onClick,
         modifier = modifier.fillMaxWidth()
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
