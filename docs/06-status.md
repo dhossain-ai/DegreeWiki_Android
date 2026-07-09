@@ -1,6 +1,6 @@
 # Android Status
 
-Last updated: 2026-07-09
+Last updated: 2026-07-10
 
 ## Current Truth
 
@@ -13,6 +13,15 @@ Last updated: 2026-07-09
 - Auth: Supabase email/password session auth
 - Local storage: Room plus encrypted shared preferences for auth session
 
+## Bundle 1 Status
+
+- Bundle 1 state: in progress
+- Public card tap crash: fixed in code and reproduced as resolved for program detail on emulator
+- Placeholder surfaces: hidden or quarantined from misleading public presentation
+- Product flow map: created at `docs/08-android-product-flow-map.md`
+- Current validation: `./gradlew.bat test`, `./gradlew.bat build`, and `./gradlew.bat lint` passed
+- Remaining QA gap: full human-driven three-card tap verification for universities and countries should still be repeated because adb coordinate automation was inconsistent after state restoration
+
 ## Verified Working Surface
 
 - Programs list
@@ -21,7 +30,7 @@ Last updated: 2026-07-09
 - Program detail from cached list data
 - University detail from cached list data
 - Country detail from cached list data
-- Login screen
+- Login screen with email-only sign-in presentation
 - Auth-aware profile screen
 - Saved-items read and delete flow
 
@@ -44,8 +53,7 @@ Last updated: 2026-07-09
 
 ## Known Problems
 
-- placeholder screens remain in source
-- Google auth button is visible placeholder UI only
+- full three-card manual tap verification for universities and countries still needs a human pass on emulator or device
 - repository refresh methods swallow exceptions, weakening error reporting
 - auth storage implementation uses deprecated Android security APIs
 - network logging is set to `BODY` in current app code
@@ -66,18 +74,19 @@ Last updated: 2026-07-09
 - `./gradlew.bat lint`
   passed
 
-## Validation Repair Notes
+## Bundle 1 Notes
 
-- Removed stale unit test `app/src/test/java/com/example/degreewiki/ui/features/main/MainScreenViewModelTest.kt`
-- Removed stale instrumented test `app/src/androidTest/java/com/example/degreewiki/ui/features/main/MainScreenTest.kt`
-- Added compile-valid unit coverage in `app/src/test/java/com/example/degreewiki/data/mapper/MapperTest.kt`
-- Added compile-valid Compose coverage in `app/src/androidTest/java/com/example/degreewiki/ui/features/main/BottomNavigationBarTest.kt`
-- No product behavior changed in this phase
-- No production app code changed in this phase
+- Reproduced the original public browse crash from logcat before fixing it
+- Updated Navigation 3 detail routing to pass typed nav keys into Hilt view models instead of assuming an `id` in `SavedStateHandle`
+- Added student-friendly unavailable states and trust copy on detail screens
+- Removed the fake Google sign-in button from the visible login flow
+- Reworded placeholder chat, Fit Finder, and discover surfaces so they no longer present as fake product features
+- Added the Android product flow map doc for future bundles
 
 ## Recommended Next Phase
 
-Small production-safe test hardening:
+Bundle 2 should finish public browse hardening:
 
-- add more low-risk tests around current mappers, navigation-free composables, and pure state logic
-- keep product scope unchanged while improving validation confidence
+- complete a human-driven university and country tap sweep on device or emulator
+- add low-risk coverage around detail-route creation and empty-state rendering
+- decide whether to rename the Countries tab to Destinations in a future product-alignment bundle

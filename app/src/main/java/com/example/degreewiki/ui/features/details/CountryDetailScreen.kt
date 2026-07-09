@@ -15,9 +15,12 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CountryDetailScreen(
+    navKey: com.example.degreewiki.ui.navigation.CountryDetail,
     onBackClick: () -> Unit,
-    viewModel: CountryDetailViewModel = hiltViewModel()
 ) {
+    val viewModel = hiltViewModel<CountryDetailViewModel, CountryDetailViewModel.Factory>(
+        creationCallback = { factory -> factory.create(navKey) }
+    )
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
     Scaffold(
@@ -66,9 +69,9 @@ fun CountryDetailScreen(
                             text = country.name,
                             style = MaterialTheme.typography.headlineMedium
                         )
-                        
+
                         HorizontalDivider()
-                        
+
                         country.summary?.let {
                             Text(
                                 text = "Summary",
@@ -82,16 +85,18 @@ fun CountryDetailScreen(
                         }
                     }
                 }
+
+                Text(
+                    text = "Details can change. Confirm final information on the official source before applying.",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
             }
         } else {
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(innerPadding),
-                contentAlignment = Alignment.Center
-            ) {
-                Text("Country not found")
-            }
+            DetailUnavailableState(
+                message = "We could not load this destination right now.",
+                modifier = Modifier.padding(innerPadding)
+            )
         }
     }
 }

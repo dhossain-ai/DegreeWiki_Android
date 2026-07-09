@@ -1,5 +1,79 @@
 # Android Task Log
 
+## 2026-07-10 - Bundle 1 Public Browse Stability + Flow Reset
+
+- Scope targeted public browse stability only.
+- Reproduced the public browse crash on emulator before fixing it.
+- Captured original crash signature from logcat:
+  - `java.lang.IllegalStateException: Required value was null.`
+  - crash source: detail view models expected `savedStateHandle["id"]` even though the Navigation 3 route was being passed as a typed nav key
+- Hit one intermediate follow-up crash while implementing the fix:
+  - `The ViewModelStoreNavEntryDecorator requires adding the SavedStateNavEntryDecorator`
+  - resolved by restoring the default `rememberSaveableStateHolderNavEntryDecorator()` alongside `rememberViewModelStoreNavEntryDecorator()`
+- Changed detail navigation to the official Navigation 3 pattern:
+  - typed `ProgramDetail`, `UniversityDetail`, and `CountryDetail` keys are passed from `entry<T> { key -> ... }`
+  - Hilt view models now use assisted injection with `creationCallback`
+- Hardened detail screens:
+  - added neutral unavailable states instead of crashing
+  - removed unsafe assumptions about missing route arguments
+  - added trust copy reminding users to confirm final information on official sources
+- Quarantined misleading placeholder surfaces:
+  - removed the visible fake Google sign-in button from `LoginScreen`
+  - replaced placeholder-only copy in chat, Fit Finder, and discover screens with professional deferred-feature messages
+- Added product documentation:
+  - created `docs/08-android-product-flow-map.md`
+- Files created:
+  - `docs/08-android-product-flow-map.md`
+- Files modified:
+  - `app/src/main/java/com/example/degreewiki/ui/navigation/Navigation.kt`
+  - `app/src/main/java/com/example/degreewiki/ui/features/details/ProgramDetailViewModel.kt`
+  - `app/src/main/java/com/example/degreewiki/ui/features/details/ProgramDetailScreen.kt`
+  - `app/src/main/java/com/example/degreewiki/ui/features/details/UniversityDetailViewModel.kt`
+  - `app/src/main/java/com/example/degreewiki/ui/features/details/UniversityDetailScreen.kt`
+  - `app/src/main/java/com/example/degreewiki/ui/features/details/CountryDetailViewModel.kt`
+  - `app/src/main/java/com/example/degreewiki/ui/features/details/CountryDetailScreen.kt`
+  - `app/src/main/java/com/example/degreewiki/ui/features/auth/AuthScreen.kt`
+  - `app/src/main/java/com/example/degreewiki/ui/features/chat/ChatScreen.kt`
+  - `app/src/main/java/com/example/degreewiki/ui/features/fitfinder/FitFinderScreen.kt`
+  - `app/src/main/java/com/example/degreewiki/ui/features/discover/DiscoverScreen.kt`
+  - `docs/06-status.md`
+  - `docs/07-task-log.md`
+- Files deleted:
+  - none
+- Intentionally not changed:
+  - no Home screen implementation
+  - no Fit Finder implementation
+  - no chat implementation
+  - no scholarships or guides implementation
+  - no backend or API endpoint changes
+  - no dependency additions
+  - no Room migration changes
+  - no auth storage redesign
+  - no large architecture refactor
+- Validation commands run successfully on the final code:
+  - `./gradlew.bat test`
+  - `./gradlew.bat build`
+  - `./gradlew.bat lint`
+- Validation notes:
+  - earlier Gradle and Kotlin cache errors during this session were caused by overlapping local Gradle runs while I was iterating; after stopping daemons and clearing workspace build caches, the required validation commands passed sequentially
+- Manual QA completed:
+  - app opens
+  - programs tab loads
+  - tapped 3 program cards on emulator without crash
+  - verified program detail screen renders from cached data with trust copy
+  - fake Google sign-in is no longer visible in the shipped login screen source
+- Manual QA still recommended:
+  - repeat a human-driven three-card sweep for universities and countries on emulator or device
+  - adb coordinate automation was inconsistent once Navigation 3 restored previous screen state, so I am not claiming a full human pass there yet
+- Known issues remaining:
+  - universities and countries still need a final human three-card tap sweep
+  - repository refresh failures are still swallowed
+  - auth storage still uses deprecated Android security APIs
+  - network logging is still set to `BODY`
+  - Room still uses destructive migration fallback
+- Next recommended bundle:
+  - finish the remaining public browse QA sweep and add small low-risk tests around detail-route creation and unavailable-state rendering
+
 ## 2026-07-09 - Validation Repair Only
 
 - Scope held to validation repair only.
