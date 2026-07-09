@@ -13,80 +13,64 @@ Last updated: 2026-07-10
 - Auth: Supabase email/password session auth
 - Local storage: Room plus encrypted shared preferences for auth session
 
-## Bundle 1 Status
+## Bundle 2 Status
 
-- Bundle 1 state: in progress
-- Public card tap crash: fixed in code and reproduced as resolved for program detail on emulator
-- Placeholder surfaces: hidden or quarantined from misleading public presentation
-- Product flow map: created at `docs/08-android-product-flow-map.md`
-- Current validation: `./gradlew.bat test`, `./gradlew.bat build`, and `./gradlew.bat lint` passed
-- Remaining QA gap: full human-driven three-card tap verification for universities and countries should still be repeated because adb coordinate automation was inconsistent after state restoration
+- Bundle 2 state: completed
+- Home tab added: yes
+- Home is now the first bottom-navigation tab
+- Current bottom navigation: `Home / Programs / Universities / Destinations / Profile`
+- Design-system foundation created: yes, with shared shell/card/state components in Compose
+- Public browse flow from Bundle 1 preserved: yes
 
-## Verified Working Surface
+## What Improved In Bundle 2
 
-- Programs list
-- Universities list
-- Countries list
-- Program detail from cached list data
-- University detail from cached list data
-- Country detail from cached list data
-- Login screen with email-only sign-in presentation
-- Auth-aware profile screen
-- Saved-items read and delete flow
+- Added a mobile-native Home screen with:
+  - DegreeWiki header and student-friendly intro copy
+  - search-entry card routed into Programs
+  - compact trust/source note
+  - real quick-browse entries for Programs, Universities, and Destinations
+  - real cache-backed featured items only
+  - deferred Fit Finder, scholarship, guide, and question/help messaging without fake implementations
+- Restyled public list screens to use the warmer app shell and shared cards.
+- Reduced the old generic Material-demo feel across the public browse surface.
 
-## Verified But Not Fully Product-Ready
+## What Remains Basic Or Incomplete
 
-- Search API contract exists in client but is not wired to UI
-- Bootstrap API contract exists in client but is not wired to UI
-- Room caching exists but is simple cache persistence, not a full offline product
+- Detail screens are still only lightly polished and not fully migrated onto the new shared shell layer.
+- Bottom-nav `Destinations` text is truncated with ellipsis on narrow emulator width to avoid a two-line wrap.
+- Home does not implement real advanced search, Fit Finder, chat, scholarships, or guides.
+- Repository refresh methods still swallow exceptions, which limits richer error reporting.
 
-## Verified Missing Or Deferred
+## Validation Results
 
-- Native Fit Finder flow
-- Native AI chat flow
-- Scholarship browsing
-- Dedicated detail API fetching
-- Save-item create flow
-- Route-level login flow
-- Real search/filter/sort UI
-- Shared design-system components for trust/loading/error states
-
-## Known Problems
-
-- full three-card manual tap verification for universities and countries still needs a human pass on emulator or device
-- repository refresh methods swallow exceptions, weakening error reporting
-- auth storage implementation uses deprecated Android security APIs
-- network logging is set to `BODY` in current app code
-- database uses destructive migration fallback
-
-## Docs Status
-
-- `docs/webapp-handoff/` is historical context only
-- older copied status/task-log files are web-repo status, not Android app status
-- the `docs/00-07` Android docs are now the active Android truth set
-
-## Validation Snapshot
-
-- `./gradlew.bat build`
-  passed
 - `./gradlew.bat test`
+  passed
+- `./gradlew.bat build`
   passed
 - `./gradlew.bat lint`
   passed
 
-## Bundle 1 Notes
+## Manual QA Results
 
-- Reproduced the original public browse crash from logcat before fixing it
-- Updated Navigation 3 detail routing to pass typed nav keys into Hilt view models instead of assuming an `id` in `SavedStateHandle`
-- Added student-friendly unavailable states and trust copy on detail screens
-- Removed the fake Google sign-in button from the visible login flow
-- Reworded placeholder chat, Fit Finder, and discover surfaces so they no longer present as fake product features
-- Added the Android product flow map doc for future bundles
+- App opens
+- Home appears first
+- Home shows only real cached data plus clearly deferred entries
+- Bottom navigation works for:
+  - Home
+  - Programs
+  - Universities
+  - Destinations
+  - Profile
+- Program list loads
+- University list loads
+- Destinations list loads
+- Program detail opens without crash
+- University detail opens without crash
+- Country detail opens without crash
+- Profile opens
+- Fake Google sign-in button did not return
+- Chat and Fit Finder are not exposed as fake working product features
 
-## Recommended Next Phase
+## Recommended Next Bundle
 
-Bundle 2 should finish public browse hardening:
-
-- complete a human-driven university and country tap sweep on device or emulator
-- add low-risk coverage around detail-route creation and empty-state rendering
-- decide whether to rename the Countries tab to Destinations in a future product-alignment bundle
+Bundle 3 should extend the design foundation into detail screens and improve narrow-device app-shell polish without expanding into fake product surfaces.

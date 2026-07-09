@@ -1,92 +1,53 @@
 # Android Design System
 
-Last audited: 2026-07-09
+Last audited: 2026-07-10
 
-## Current Implementation
+## Current Color Direction
 
-The app uses Compose Material 3 theming with a custom `DegreeWikiTheme`.
+- Background: warm off-white for screen-level surfaces
+- Cards: white with subtle elevation and soft outline treatment
+- Primary actions and headings: academic navy
+- Secondary copy: slate
+- Trust accent: green used only for trust-note treatment, not as fake verification
+- Deferred/soon states: neutral gray and amber badge tones
 
-## Verified Theme Tokens
+## Reusable Components Introduced
 
-### Light Theme Direction
+- `DegreeWikiScreen`
+- `DegreeWikiCard`
+- `SectionHeader`
+- `TrustNote`
+- `StatusBadge`
+- `PrimaryActionButton`
+- `EmptyState`
+- `ErrorState`
+- `LoadingState`
+- `ScreenHero`
+- `QuickBrowseCard`
+- `DeferredFeatureCard`
+- `SearchEntryCard`
 
-- Primary: deep academic navy blue
-- Secondary: teal
-- Tertiary: indigo
-- Background: very light slate/off-white
-- Surface: white
-- Text: dark slate/navy
+These live in `app/src/main/java/com/example/degreewiki/ui/components/DegreeWikiComponents.kt` and are now used by Home plus the public browse lists.
 
-This is directionally compatible with the intended DegreeWiki product identity, especially for the light theme.
+## Mobile Card And Shell Rules
 
-### Dark Theme
+- Prefer a warm off-white app background instead of generic gray or purple-tinted surfaces.
+- Keep top-level screens scrollable with a clear hero heading and short orientation copy.
+- Use white cards with rounded corners, modest shadow, and enough padding for dense study-abroad data.
+- Keep list cards factual and compact. Show only fields already available from API/cache-backed models.
+- Use shared empty, loading, and error states instead of ad hoc centered text.
+- Keep trust copy compact and source-aware.
+- Avoid making unfinished surfaces feel like live product features.
 
-- Full dark palette exists and follows the same token families
-- Product guidance provided for this audit emphasized a warm light educational feel; dark mode exists in code but has not been separately product-reviewed here
+## No-Fake-Data Rule
 
-## Typography
+- Do not invent programs, universities, destinations, scholarships, tuition, deadlines, or source metadata.
+- Do not use green badges to imply verification unless that status is truly backed by data.
+- Real API/cache-backed content may be labeled neutrally, but not presented as formally verified.
+- Deferred surfaces such as chat, Fit Finder, scholarships, and guides must stay clearly planned or login-gated until real Android flows exist.
 
-- Uses Material 3 typography slots
-- All styles currently use `FontFamily.SansSerif`
-- No custom academic type family is bundled
+## Current Gaps
 
-## Current Component Patterns
-
-- `Scaffold` + `TopAppBar`
-- `NavigationBar`
-- `ElevatedCard`
-- `AssistChip`
-- `OutlinedTextField`
-- `Button` and `OutlinedButton`
-- `CircularProgressIndicator`
-- `LinearProgressIndicator`
-
-## Current UX Character
-
-Verified current feel:
-
-- clean
-- simple
-- list-first
-- generic Material 3
-
-Not yet strongly expressed:
-
-- mature education portal tone
-- structured academic information density
-- verified/trust status language
-- deadline/status color semantics
-- source-aware fact presentation
-
-## Loading, Error, Empty States
-
-Verified patterns:
-
-- list screens show centered spinner on load
-- list screens show generic retry state on error
-- list screens show simple empty text plus refresh button
-- detail screens show spinner, content, or plain "not found" text
-- profile shows card header, spinner, empty state, and inline removal actions
-
-Current limitations:
-
-- states are functional but visually minimal
-- no shared state components
-- no trust-specific empty or error copy
-- some repository failures may not surface as UI error states because refresh exceptions are swallowed
-
-## Placeholder Or Non-Product-Safe UI
-
-- `DiscoverScreen` literal placeholder text
-- `ChatScreen` literal placeholder text
-- `FitFinderScreen` literal placeholder text
-- Auth screen includes a visible "Continue with Google" button that is explicitly a placeholder TODO
-
-These should not be documented as real user-ready flows.
-
-## Design Guidance For Future Work
-
-- Preserve the light academic palette direction already present in the light theme
-- Increase structured content presentation before adding visual novelty
-- Prefer source/trust/status components tied to real API data rather than cosmetic badges
-- Replace placeholder CTAs before expanding navigation to unfinished features
+- Detail screens still use older layouts and have not been fully brought onto the shared shell.
+- Bottom navigation uses truncation on narrow devices to keep `Destinations` on one line.
+- Typography still relies on system sans-serif rather than a bundled product type family.

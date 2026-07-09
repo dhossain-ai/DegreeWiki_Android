@@ -21,21 +21,22 @@ class BottomNavigationBarTest {
     fun bottomNavigationBar_showsAllTabs() {
         composeTestRule.setContent {
             BottomNavigationBar(
-                currentTab = DiscoveryTab.PROGRAMS,
+                currentTab = DiscoveryTab.HOME,
                 onTabSelected = {}
             )
         }
 
+        composeTestRule.onNodeWithText("Home").assertExists()
         composeTestRule.onNodeWithText("Programs").assertExists()
         composeTestRule.onNodeWithText("Universities").assertExists()
-        composeTestRule.onNodeWithText("Countries").assertExists()
+        composeTestRule.onNodeWithText("Destinations").assertExists()
         composeTestRule.onNodeWithText("Profile").assertExists()
     }
 
     @Test
     fun bottomNavigationBar_clickingTab_updatesSelectionState() {
         composeTestRule.setContent {
-            var currentTab by remember { mutableStateOf(DiscoveryTab.PROGRAMS) }
+            var currentTab by remember { mutableStateOf(DiscoveryTab.HOME) }
             BottomNavigationBar(
                 currentTab = currentTab,
                 onTabSelected = { currentTab = it }
@@ -43,7 +44,7 @@ class BottomNavigationBarTest {
         }
 
         composeTestRule.onNodeWithText("Profile").performClick()
-        composeTestRule.onNodeWithText("Countries").performClick()
-        composeTestRule.onNodeWithText("Countries").assertExists()
+        composeTestRule.onNodeWithText("Destinations").performClick()
+        composeTestRule.onNodeWithText("Destinations").assertExists()
     }
 }

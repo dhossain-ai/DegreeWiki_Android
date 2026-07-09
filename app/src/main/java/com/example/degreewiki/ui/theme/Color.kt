@@ -4,28 +4,28 @@ import androidx.compose.ui.graphics.Color
 
 // Premium Clean Palette for DegreeWiki
 // Light Theme Colors
-val LightPrimary = Color(0xFF1E3A8A)       // Deep Navy Slate Blue
+val LightPrimary = Color(0xFF1D3C73)       // Academic navy
 val LightOnPrimary = Color(0xFFFFFFFF)
-val LightPrimaryContainer = Color(0xFFDBEAFE)
-val LightOnPrimaryContainer = Color(0xFF1E40AF)
+val LightPrimaryContainer = Color(0xFFDCE8F8)
+val LightOnPrimaryContainer = Color(0xFF163259)
 
-val LightSecondary = Color(0xFF0F766E)     // Deep Teal
+val LightSecondary = Color(0xFF4E6B8A)     // Slate blue
 val LightOnSecondary = Color(0xFFFFFFFF)
-val LightSecondaryContainer = Color(0xFFCCFBF1)
-val LightOnSecondaryContainer = Color(0xFF115E59)
+val LightSecondaryContainer = Color(0xFFE7EEF6)
+val LightOnSecondaryContainer = Color(0xFF294867)
 
-val LightTertiary = Color(0xFF4338CA)      // Deep Indigo
+val LightTertiary = Color(0xFF7A5B20)      // Warm accent
 val LightOnTertiary = Color(0xFFFFFFFF)
-val LightTertiaryContainer = Color(0xFFE0E7FF)
-val LightOnTertiaryContainer = Color(0xFF3730A3)
+val LightTertiaryContainer = Color(0xFFF5E8C8)
+val LightOnTertiaryContainer = Color(0xFF6A4C16)
 
-val LightBackground = Color(0xFFF8FAFC)    // Soft Slate Gray/White
+val LightBackground = Color(0xFFF7F4ED)    // Warm off-white
 val LightOnBackground = Color(0xFF0F172A)  // Dark Slate Gray text
 val LightSurface = Color(0xFFFFFFFF)
 val LightOnSurface = Color(0xFF0F172A)
-val LightSurfaceVariant = Color(0xFFF1F5F9)
+val LightSurfaceVariant = Color(0xFFF2EEE5)
 val LightOnSurfaceVariant = Color(0xFF475569)
-val LightOutline = Color(0xFFCBD5E1)
+val LightOutline = Color(0xFFD2C7B4)
 
 // Dark Theme Colors
 val DarkPrimary = Color(0xFF93C5FD)        // Bright Soft Blue

@@ -1,163 +1,79 @@
 # Android Task Log
 
-## 2026-07-10 - Bundle 1 Public Browse Stability + Flow Reset
+## 2026-07-10 - Bundle 2 Mobile Home + App Shell Design Foundation
 
-- Scope targeted public browse stability only.
-- Reproduced the public browse crash on emulator before fixing it.
-- Captured original crash signature from logcat:
-  - `java.lang.IllegalStateException: Required value was null.`
-  - crash source: detail view models expected `savedStateHandle["id"]` even though the Navigation 3 route was being passed as a typed nav key
-- Hit one intermediate follow-up crash while implementing the fix:
-  - `The ViewModelStoreNavEntryDecorator requires adding the SavedStateNavEntryDecorator`
-  - resolved by restoring the default `rememberSaveableStateHolderNavEntryDecorator()` alongside `rememberViewModelStoreNavEntryDecorator()`
-- Changed detail navigation to the official Navigation 3 pattern:
-  - typed `ProgramDetail`, `UniversityDetail`, and `CountryDetail` keys are passed from `entry<T> { key -> ... }`
-  - Hilt view models now use assisted injection with `creationCallback`
-- Hardened detail screens:
-  - added neutral unavailable states instead of crashing
-  - removed unsafe assumptions about missing route arguments
-  - added trust copy reminding users to confirm final information on official sources
-- Quarantined misleading placeholder surfaces:
-  - removed the visible fake Google sign-in button from `LoginScreen`
-  - replaced placeholder-only copy in chat, Fit Finder, and discover screens with professional deferred-feature messages
-- Added product documentation:
-  - created `docs/08-android-product-flow-map.md`
-- Files created:
-  - `docs/08-android-product-flow-map.md`
-- Files modified:
-  - `app/src/main/java/com/example/degreewiki/ui/navigation/Navigation.kt`
-  - `app/src/main/java/com/example/degreewiki/ui/features/details/ProgramDetailViewModel.kt`
-  - `app/src/main/java/com/example/degreewiki/ui/features/details/ProgramDetailScreen.kt`
-  - `app/src/main/java/com/example/degreewiki/ui/features/details/UniversityDetailViewModel.kt`
-  - `app/src/main/java/com/example/degreewiki/ui/features/details/UniversityDetailScreen.kt`
-  - `app/src/main/java/com/example/degreewiki/ui/features/details/CountryDetailViewModel.kt`
-  - `app/src/main/java/com/example/degreewiki/ui/features/details/CountryDetailScreen.kt`
-  - `app/src/main/java/com/example/degreewiki/ui/features/auth/AuthScreen.kt`
-  - `app/src/main/java/com/example/degreewiki/ui/features/chat/ChatScreen.kt`
-  - `app/src/main/java/com/example/degreewiki/ui/features/fitfinder/FitFinderScreen.kt`
-  - `app/src/main/java/com/example/degreewiki/ui/features/discover/DiscoverScreen.kt`
-  - `docs/06-status.md`
-  - `docs/07-task-log.md`
-- Files deleted:
-  - none
-- Intentionally not changed:
-  - no Home screen implementation
-  - no Fit Finder implementation
-  - no chat implementation
-  - no scholarships or guides implementation
-  - no backend or API endpoint changes
-  - no dependency additions
-  - no Room migration changes
-  - no auth storage redesign
-  - no large architecture refactor
-- Validation commands run successfully on the final code:
-  - `./gradlew.bat test`
-  - `./gradlew.bat build`
-  - `./gradlew.bat lint`
-- Validation notes:
-  - earlier Gradle and Kotlin cache errors during this session were caused by overlapping local Gradle runs while I was iterating; after stopping daemons and clearing workspace build caches, the required validation commands passed sequentially
-- Manual QA completed:
-  - app opens
-  - programs tab loads
-  - tapped 3 program cards on emulator without crash
-  - verified program detail screen renders from cached data with trust copy
-  - fake Google sign-in is no longer visible in the shipped login screen source
-- Manual QA still recommended:
-  - repeat a human-driven three-card sweep for universities and countries on emulator or device
-  - adb coordinate automation was inconsistent once Navigation 3 restored previous screen state, so I am not claiming a full human pass there yet
-- Known issues remaining:
-  - universities and countries still need a final human three-card tap sweep
-  - repository refresh failures are still swallowed
-  - auth storage still uses deprecated Android security APIs
-  - network logging is still set to `BODY`
-  - Room still uses destructive migration fallback
-- Next recommended bundle:
-  - finish the remaining public browse QA sweep and add small low-risk tests around detail-route creation and unavailable-state rendering
+- Scope targeted the native mobile shell and public browse presentation only.
+- Added a real `Home` first tab to bottom navigation.
+- Replaced the generic discover/home placeholder with a student-first public Home screen.
+- Introduced shared Compose design-system primitives for shell, cards, headings, trust note, badges, buttons, and loading/error/empty states.
+- Restyled public Programs, Universities, and Destinations list screens to use the shared shell.
+- Kept Bundle 1 detail navigation and safe cached detail behavior intact.
+- Added real cache-backed featured content on Home only where data was already available.
+- Kept Fit Finder, chat, scholarships, and guides in clearly deferred or login-oriented presentation only.
 
-## 2026-07-09 - Validation Repair Only
+## Files Created
 
-- Scope held to validation repair only.
-- Removed stale unit test file:
-  - `app/src/test/java/com/example/degreewiki/ui/features/main/MainScreenViewModelTest.kt`
-- Removed stale instrumented test file:
-  - `app/src/androidTest/java/com/example/degreewiki/ui/features/main/MainScreenTest.kt`
-- Added replacement unit test file:
-  - `app/src/test/java/com/example/degreewiki/data/mapper/MapperTest.kt`
-- Added replacement instrumented test file:
-  - `app/src/androidTest/java/com/example/degreewiki/ui/features/main/BottomNavigationBarTest.kt`
-- Updated docs:
-  - `docs/06-status.md`
-  - `docs/07-task-log.md`
-- Validation commands run:
-  - `./gradlew.bat test`
-  - `./gradlew.bat build`
-  - `./gradlew.bat lint`
-- Validation results:
-  - `./gradlew.bat test` passed
-  - `./gradlew.bat build` passed
-  - `./gradlew.bat lint` passed
-- Production code changes:
-  - none
-- Intentionally excluded work:
-  - no navigation changes
-  - no repository behavior changes
-  - no UI redesign
-  - no placeholder screen cleanup outside stale test removal
-  - no API changes
-  - no Room migration changes
-  - no logging/security changes
-  - no dependency changes
-  - no Fit Finder, chat, save-item, or detail API work
-- Known issues remaining:
-  - placeholder product screens still exist in source
-  - Google auth button is still a visible placeholder action
-  - repository refresh failures are still swallowed
-  - auth storage still uses deprecated Android security APIs
-  - network logging is still set to `BODY`
-  - Room still uses destructive migration fallback
-- Next recommended phase:
-  - small production-safe test hardening only, or a separately approved reliability phase
+- `app/src/main/java/com/example/degreewiki/ui/components/DegreeWikiComponents.kt`
+- `app/src/main/java/com/example/degreewiki/ui/features/home/HomeScreen.kt`
+- `app/src/main/java/com/example/degreewiki/ui/features/home/HomeViewModel.kt`
 
-## 2026-07-09 - Audit + Documentation Reset
+## Files Modified
 
-- Scanned the full Android repo structure before planning.
-- Verified the project is a single-module native Kotlin app using Compose, Hilt, Room, Retrofit, OkHttp, and Supabase Auth.
-- Verified active navigation, screen surface, repositories, DTOs, Room entities, and theme files from source.
-- Confirmed the app is Compose-first with no active XML layout-based screen system.
-- Confirmed current mobile API usage is limited to:
-  - `/api/mobile/programs`
-  - `/api/mobile/universities`
-  - `/api/mobile/countries`
-  - `/api/mobile/me`
-  - `/api/mobile/me/saved-items`
-  - `/api/mobile/me/saved-items/{id}`
-  - plus unused-but-defined `bootstrap` and `programs/search`
-- Identified placeholder or incomplete UI in:
-  - `DiscoverScreen`
-  - `ChatScreen`
-  - `FitFinderScreen`
-  - Google auth button in `LoginScreen`
-- Identified architectural constraints:
-  - detail screens depend on Room-cached list data rather than dedicated detail endpoints
-  - repository refresh errors are swallowed instead of surfacing reliably to UI
-  - navigation mixes route-based detail navigation with local state tab switching
-- Identified maintenance risks:
-  - stale unit tests referencing removed classes
-  - stale instrumented test source
-  - deprecated encrypted storage APIs
-  - BODY-level HTTP logging enabled
-  - destructive Room migration fallback enabled
-- Reviewed inherited docs under `docs/webapp-handoff/` and confirmed they are useful context but not trustworthy Android status.
-- Created a fresh Android docs set:
-  - `00-android-project-overview.md`
-  - `01-android-product-decisions.md`
-  - `02-android-architecture.md`
-  - `03-android-api-contract.md`
-  - `04-android-design-system.md`
-  - `05-android-coding-standards.md`
-  - `06-status.md`
-  - `07-task-log.md`
-- Ran validation:
-  - `./gradlew.bat build` failed due to pre-existing stale test compilation errors
-  - `./gradlew.bat test` failed due to pre-existing stale test compilation errors
-  - `./gradlew.bat lint` passed
+- `app/src/androidTest/java/com/example/degreewiki/ui/features/main/BottomNavigationBarTest.kt`
+- `app/src/main/java/com/example/degreewiki/ui/features/discover/CountriesScreen.kt`
+- `app/src/main/java/com/example/degreewiki/ui/features/discover/ProgramsScreen.kt`
+- `app/src/main/java/com/example/degreewiki/ui/features/discover/UniversitiesScreen.kt`
+- `app/src/main/java/com/example/degreewiki/ui/features/main/BottomNavigationBar.kt`
+- `app/src/main/java/com/example/degreewiki/ui/features/main/MainScreen.kt`
+- `app/src/main/java/com/example/degreewiki/ui/theme/Color.kt`
+- `docs/04-android-design-system.md`
+- `docs/06-status.md`
+- `docs/07-task-log.md`
+- `docs/08-android-product-flow-map.md`
+
+## Files Deleted
+
+- none
+
+## Intentionally Not Changed
+
+- no Fit Finder implementation
+- no chat implementation
+- no scholarship or guide feature implementation
+- no backend or API endpoint changes
+- no dependency additions
+- no Room migration changes
+- no auth storage redesign
+- no network logging changes
+- no repository architecture rewrite
+- no deep redesign of every detail screen
+
+## Validation Results
+
+- `./gradlew.bat test` passed
+- `./gradlew.bat build` passed
+- `./gradlew.bat lint` passed
+
+## Manual QA Results
+
+- Installed the fresh debug APK on emulator `emulator-5554`
+- Verified Home renders first with DegreeWiki heading, trust note, quick browse, and deferred feature messaging
+- Verified Programs list loads and first program detail opens without crash
+- Verified Universities list loads and first university detail opens without crash
+- Verified Destinations list loads and first destination detail opens without crash
+- Verified Profile opens and did not reintroduce the fake Google sign-in button
+- Verified Chat and Fit Finder are not exposed as fake working flows in the new shell
+
+## Known Issues
+
+- Bottom-nav `Destinations` label is truncated with ellipsis on narrow emulator width to avoid multi-line wrapping
+- Detail screens still use older layouts and only received light polish in this bundle
+- Repository refresh failures are still swallowed
+- Auth storage still uses deprecated Android security APIs
+- Network logging is still set to `BODY`
+- Room still uses destructive migration fallback
+
+## Next Recommended Bundle
+
+- Extend the new shell to detail screens and improve narrow-device bottom-nav polish
+- Add low-risk tests around Home navigation and public empty/error states

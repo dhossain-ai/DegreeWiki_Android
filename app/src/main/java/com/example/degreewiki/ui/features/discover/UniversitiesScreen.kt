@@ -1,19 +1,28 @@
 package com.example.degreewiki.ui.features.discover
 
-import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material3.*
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.degreewiki.domain.model.University
+import com.example.degreewiki.ui.components.DegreeWikiCard
+import com.example.degreewiki.ui.components.DegreeWikiScreen
+import com.example.degreewiki.ui.components.EmptyState
+import com.example.degreewiki.ui.components.ErrorState
+import com.example.degreewiki.ui.components.LoadingState
+import com.example.degreewiki.ui.components.ScreenHero
+import com.example.degreewiki.ui.components.SectionHeader
+import com.example.degreewiki.ui.components.StatusBadge
+import com.example.degreewiki.ui.components.StatusBadgeTone
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun UniversitiesScreen(
     onItemClick: (String) -> Unit,
@@ -22,63 +31,47 @@ fun UniversitiesScreen(
 ) {
     val state by viewModel.uiState.collectAsStateWithLifecycle()
 
-    Scaffold(
-        topBar = {
-            TopAppBar(title = { Text("Universities") })
-        },
-        modifier = modifier
-    ) { padding ->
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(padding)
-        ) {
-            when (state) {
-                is DiscoveryUiState.Loading -> {
-                    CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
-                }
-                is DiscoveryUiState.Error -> {
-                    Column(
-                        modifier = Modifier.align(Alignment.Center),
-                        horizontalAlignment = Alignment.CenterHorizontally
-                    ) {
-                        Text(
-                            text = "Error loading universities",
-                            color = MaterialTheme.colorScheme.error,
-                            style = MaterialTheme.typography.bodyLarge
+    when (state) {
+        is DiscoveryUiState.Loading -> LoadingState(
+            modifier = modifier,
+            label = "Loading universities"
+        )
+        is DiscoveryUiState.Error -> ErrorState(
+            title = "Universities unavailable",
+            message = "We could not load universities right now. Try again to refresh the current catalog.",
+            actionLabel = "Retry",
+            onActionClick = viewModel::refresh,
+            modifier = modifier
+        )
+        is DiscoveryUiState.Success -> {
+            val data = (state as DiscoveryUiState.Success<University>).data
+            if (data.isEmpty()) {
+                EmptyState(
+                    title = "No universities available",
+                    message = "The app does not have any cached university records yet.",
+                    actionLabel = "Refresh",
+                    onActionClick = viewModel::refresh,
+                    modifier = modifier
+                )
+            } else {
+                DegreeWikiScreen(modifier = modifier) {
+                    item {
+                        ScreenHero(
+                            title = "Universities",
+                            subtitle = "Browse institution profiles backed by the current mobile data feed."
                         )
-                        Spacer(modifier = Modifier.height(8.dp))
-                        Button(onClick = { viewModel.refresh() }) {
-                            Text("Retry")
-                        }
                     }
-                }
-                is DiscoveryUiState.Success -> {
-                    val data = (state as DiscoveryUiState.Success<University>).data
-                    if (data.isEmpty()) {
-                        Column(
-                            modifier = Modifier.align(Alignment.Center),
-                            horizontalAlignment = Alignment.CenterHorizontally
-                        ) {
-                            Text("No universities found.")
-                            Spacer(modifier = Modifier.height(8.dp))
-                            Button(onClick = { viewModel.refresh() }) {
-                                Text("Refresh")
-                            }
-                        }
-                    } else {
-                        LazyColumn(
-                            contentPadding = PaddingValues(16.dp),
-                            verticalArrangement = Arrangement.spacedBy(16.dp),
-                            modifier = Modifier.fillMaxSize()
-                        ) {
-                            items(data, key = { it.id }) { university ->
-                                UniversityCard(
-                                    university = university,
-                                    onClick = { onItemClick(university.id) }
-                                )
-                            }
-                        }
+                    item {
+                        SectionHeader(
+                            title = "${data.size} universities available",
+                            subtitle = "Cards show only fields already available in the cache."
+                        )
+                    }
+                    items(data, key = { it.id }) { university ->
+                        UniversityCard(
+                            university = university,
+                            onClick = { onItemClick(university.id) }
+                        )
                     }
                 }
             }
@@ -88,20 +81,34 @@ fun UniversitiesScreen(
 
 @Composable
 fun UniversityCard(university: University, onClick: () -> Unit, modifier: Modifier = Modifier) {
-    ElevatedCard(
-        onClick = onClick,
-        modifier = modifier.fillMaxWidth()
+    DegreeWikiCard(
+        modifier = modifier,
+        onClick = onClick
     ) {
-        Column(modifier = Modifier.padding(16.dp)) {
-            Text(text = university.name, style = MaterialTheme.typography.titleMedium)
-            Spacer(modifier = Modifier.height(4.dp))
+        Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+            Text(
+                text = university.name,
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.SemiBold,
+                color = MaterialTheme.colorScheme.onSurface
+            )
             university.city?.let {
-                Text(text = it, style = MaterialTheme.typography.bodyMedium)
+                StatusBadge(
+                    label = it,
+                    tone = StatusBadgeTone.Neutral
+                )
             }
-            Spacer(modifier = Modifier.height(8.dp))
             university.overview?.let {
-                Text(text = it, style = MaterialTheme.typography.bodySmall, maxLines = 3)
-            }
+                Text(
+                    text = it,
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            } ?: Text(
+                text = "Overview is not available in the current mobile cache.",
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
         }
     }
 }

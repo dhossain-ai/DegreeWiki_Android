@@ -4,39 +4,39 @@ Last updated: 2026-07-10
 
 ## A. Purpose
 
-This file maps DegreeWiki web product behavior into the intended native Android mobile flow so future Android bundles stay aligned with the student-first product.
+This file maps the current DegreeWiki Android public flow so future bundles stay aligned with the student-first browse product.
 
 ## B. Public Access Without Login
 
-Public users can browse without an account:
+Public users can currently access:
 
-- Home later
+- Home
 - Programs
 - Program details
 - Universities
 - University details
-- Countries and destinations
+- Destinations
 - Country details
-- Scholarships later
-- Guides and articles later
-- Search and filter later
-- Basic local compare later, if implemented without account sync
+
+Public users may later access, once implemented safely:
+
+- Scholarships
+- Guides and articles
+- Search/filter improvements
+- Compare or save-related flows where product rules allow
 
 ## C. Login-Required Access
 
-Login is required for:
+Login is still required for:
 
-- Save or unsave programs or scholarships
-- Saved items
-- Student dashboard and profile
-- Running or saving Fit Finder results, unless backend later supports anonymous trials
-- Fit Finder result chat
-- Personalized chat and history
-- Account settings
+- Saved-item account flows
+- Personalized profile content
+- Fit Finder follow-up flows when implemented
+- Chat/history flows when implemented
 
-## D. Bottom Navigation Direction
+## D. Bottom Navigation
 
-Near-term target bottom navigation:
+Current bottom navigation:
 
 - Home
 - Programs
@@ -44,76 +44,42 @@ Near-term target bottom navigation:
 - Destinations
 - Profile
 
-Do not implement Home in this bundle. This section documents the target only.
+Chat is not a bottom tab.
 
-## E. Home Screen Future Role
+Fit Finder is not a bottom tab.
 
-Home should later include:
+Scholarships and Guides are not bottom tabs.
 
-- DegreeWiki header
-- Search card
-- Quick browse cards
-- Trust and source note
-- Fit Finder CTA, login-gated
-- Scholarship and guide entry cards
-- Featured real database content only
-- Small general help or chat entry, not a main AI dashboard
+## E. Home Surface
 
-## F. Detail Screen Target Behavior
+Home is now the target first tab and current app entry surface.
 
-Program detail should eventually show only real API or cache-backed fields:
+Home currently includes:
 
-- title
-- university
-- country and city
-- degree level
-- subject
-- tuition if available
-- duration if available
-- language if available
-- deadline and intake if available
-- admission requirements if available
-- official or source link if available
-- save, login-gated
-- compare local or public later if supported
+- DegreeWiki heading and intro copy
+- search-entry card routed into Programs browse
+- trust/source note
+- quick browse cards for Programs, Universities, and Destinations
+- real featured content only when cache-backed data already exists
+- deferred messaging for Fit Finder, scholarships, guides, and question/help
 
-University detail should eventually show:
+## F. Deferred Public Surfaces
 
-- university name
-- country and city
-- overview
-- official website or source cues if available
-- related programs if available
+- Fit Finder remains a future CTA, not a working Android feature
+- Chat remains a future small help surface, not a main dashboard
+- Scholarships and Guides remain future public surfaces until safe Android routes exist
 
-Country detail should eventually show:
+## G. Data Truth Rule
 
-- country name
-- overview
-- study facts if available
-- tuition and living cost if available
-- visa and work guidance if available
-- related universities and programs if available
+Android must show only API or cache-backed data.
 
-## G. Chat Placement
+Do not invent:
 
-Chat should not be a main bottom navigation tab for now.
-
-Later placement:
-
-- small Home help card
-- contextual support inside Fit Finder results
-- maybe program or detail help later
-
-Chat must use the backend AI gateway or static-answer route, not local AI logic.
-
-## H. Fit Finder Placement
-
-Fit Finder should be a Home CTA later.
-
-If the user is logged out, route to login with a clear explanation.
-
-Do not implement Fit Finder in this bundle.
-
-## I. Data Truth Rule
-
-Android must show only API or cache-backed data. Do not invent universities, programs, scholarships, tuition, deadlines, source status, or verification claims.
+- programs
+- universities
+- destinations
+- scholarships
+- tuition
+- deadlines
+- verification/source claims
+- AI or Fit Finder results

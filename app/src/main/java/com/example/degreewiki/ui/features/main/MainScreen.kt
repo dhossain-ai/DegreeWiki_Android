@@ -21,6 +21,7 @@ import com.example.degreewiki.ui.features.auth.LoginScreen
 import com.example.degreewiki.ui.features.discover.CountriesScreen
 import com.example.degreewiki.ui.features.discover.ProgramsScreen
 import com.example.degreewiki.ui.features.discover.UniversitiesScreen
+import com.example.degreewiki.ui.features.home.HomeScreen
 import com.example.degreewiki.ui.features.profile.ProfileScreen
 
 @Composable
@@ -29,7 +30,7 @@ fun MainScreen(
     modifier: Modifier = Modifier,
     authViewModel: AuthViewModel = hiltViewModel()
 ) {
-    var currentTab by rememberSaveable { mutableStateOf(DiscoveryTab.PROGRAMS) }
+    var currentTab by rememberSaveable { mutableStateOf(DiscoveryTab.HOME) }
     val authState by authViewModel.authState.collectAsStateWithLifecycle()
 
     Scaffold(
@@ -42,6 +43,13 @@ fun MainScreen(
         modifier = modifier
     ) { innerPadding ->
         when (currentTab) {
+            DiscoveryTab.HOME -> HomeScreen(
+                onProgramsClick = { currentTab = DiscoveryTab.PROGRAMS },
+                onUniversitiesClick = { currentTab = DiscoveryTab.UNIVERSITIES },
+                onDestinationsClick = { currentTab = DiscoveryTab.COUNTRIES },
+                onProfileClick = { currentTab = DiscoveryTab.PROFILE },
+                modifier = Modifier.padding(innerPadding)
+            )
             DiscoveryTab.PROGRAMS -> ProgramsScreen(
                 onItemClick = { id -> onItemClick(com.example.degreewiki.ui.navigation.ProgramDetail(id)) },
                 modifier = Modifier.padding(innerPadding)
