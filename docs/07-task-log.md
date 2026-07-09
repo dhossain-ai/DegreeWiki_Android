@@ -1,0 +1,89 @@
+# Android Task Log
+
+## 2026-07-09 - Validation Repair Only
+
+- Scope held to validation repair only.
+- Removed stale unit test file:
+  - `app/src/test/java/com/example/degreewiki/ui/features/main/MainScreenViewModelTest.kt`
+- Removed stale instrumented test file:
+  - `app/src/androidTest/java/com/example/degreewiki/ui/features/main/MainScreenTest.kt`
+- Added replacement unit test file:
+  - `app/src/test/java/com/example/degreewiki/data/mapper/MapperTest.kt`
+- Added replacement instrumented test file:
+  - `app/src/androidTest/java/com/example/degreewiki/ui/features/main/BottomNavigationBarTest.kt`
+- Updated docs:
+  - `docs/06-status.md`
+  - `docs/07-task-log.md`
+- Validation commands run:
+  - `./gradlew.bat test`
+  - `./gradlew.bat build`
+  - `./gradlew.bat lint`
+- Validation results:
+  - `./gradlew.bat test` passed
+  - `./gradlew.bat build` passed
+  - `./gradlew.bat lint` passed
+- Production code changes:
+  - none
+- Intentionally excluded work:
+  - no navigation changes
+  - no repository behavior changes
+  - no UI redesign
+  - no placeholder screen cleanup outside stale test removal
+  - no API changes
+  - no Room migration changes
+  - no logging/security changes
+  - no dependency changes
+  - no Fit Finder, chat, save-item, or detail API work
+- Known issues remaining:
+  - placeholder product screens still exist in source
+  - Google auth button is still a visible placeholder action
+  - repository refresh failures are still swallowed
+  - auth storage still uses deprecated Android security APIs
+  - network logging is still set to `BODY`
+  - Room still uses destructive migration fallback
+- Next recommended phase:
+  - small production-safe test hardening only, or a separately approved reliability phase
+
+## 2026-07-09 - Audit + Documentation Reset
+
+- Scanned the full Android repo structure before planning.
+- Verified the project is a single-module native Kotlin app using Compose, Hilt, Room, Retrofit, OkHttp, and Supabase Auth.
+- Verified active navigation, screen surface, repositories, DTOs, Room entities, and theme files from source.
+- Confirmed the app is Compose-first with no active XML layout-based screen system.
+- Confirmed current mobile API usage is limited to:
+  - `/api/mobile/programs`
+  - `/api/mobile/universities`
+  - `/api/mobile/countries`
+  - `/api/mobile/me`
+  - `/api/mobile/me/saved-items`
+  - `/api/mobile/me/saved-items/{id}`
+  - plus unused-but-defined `bootstrap` and `programs/search`
+- Identified placeholder or incomplete UI in:
+  - `DiscoverScreen`
+  - `ChatScreen`
+  - `FitFinderScreen`
+  - Google auth button in `LoginScreen`
+- Identified architectural constraints:
+  - detail screens depend on Room-cached list data rather than dedicated detail endpoints
+  - repository refresh errors are swallowed instead of surfacing reliably to UI
+  - navigation mixes route-based detail navigation with local state tab switching
+- Identified maintenance risks:
+  - stale unit tests referencing removed classes
+  - stale instrumented test source
+  - deprecated encrypted storage APIs
+  - BODY-level HTTP logging enabled
+  - destructive Room migration fallback enabled
+- Reviewed inherited docs under `docs/webapp-handoff/` and confirmed they are useful context but not trustworthy Android status.
+- Created a fresh Android docs set:
+  - `00-android-project-overview.md`
+  - `01-android-product-decisions.md`
+  - `02-android-architecture.md`
+  - `03-android-api-contract.md`
+  - `04-android-design-system.md`
+  - `05-android-coding-standards.md`
+  - `06-status.md`
+  - `07-task-log.md`
+- Ran validation:
+  - `./gradlew.bat build` failed due to pre-existing stale test compilation errors
+  - `./gradlew.bat test` failed due to pre-existing stale test compilation errors
+  - `./gradlew.bat lint` passed
