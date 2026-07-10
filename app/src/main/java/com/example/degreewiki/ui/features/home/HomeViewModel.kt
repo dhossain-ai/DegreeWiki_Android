@@ -18,7 +18,9 @@ data class HomeUiState(
     val programs: List<Program> = emptyList(),
     val universities: List<University> = emptyList(),
     val countries: List<Country> = emptyList(),
-    val isRefreshing: Boolean = true
+    val isRefreshing: Boolean = true,
+    val showRefreshWarning: Boolean = false,
+    val showFullError: Boolean = false
 )
 
 @HiltViewModel
@@ -26,16 +28,33 @@ class HomeViewModel @Inject constructor(
     private val dataRepository: DataRepository
 ) : ViewModel() {
 
+    private val refreshSummary = combine(
+        dataRepository.programRefreshState,
+        dataRepository.universityRefreshState,
+        dataRepository.countryRefreshState
+    ) { programRefresh, universityRefresh, countryRefresh ->
+        val refreshStates = listOf(programRefresh, universityRefresh, countryRefresh)
+        RefreshSummary(
+            isRefreshing = refreshStates.any { it.isRefreshing },
+            hasRefreshFailure = refreshStates.any { it.lastRefreshFailed }
+        )
+    }
+
     val uiState: StateFlow<HomeUiState> = combine(
         dataRepository.programs,
         dataRepository.universities,
-        dataRepository.countries
-    ) { programs, universities, countries ->
+        dataRepository.countries,
+        refreshSummary
+    ) { programs, universities, countries, refreshSummary ->
+        val hasAnyData = programs.isNotEmpty() || universities.isNotEmpty() || countries.isNotEmpty()
+
         HomeUiState(
             programs = programs,
             universities = universities,
             countries = countries,
-            isRefreshing = false
+            isRefreshing = refreshSummary.isRefreshing,
+            showRefreshWarning = hasAnyData && refreshSummary.hasRefreshFailure,
+            showFullError = !hasAnyData && refreshSummary.hasRefreshFailure && !refreshSummary.isRefreshing
         )
     }.stateIn(
         scope = viewModelScope,
@@ -55,3 +74,8 @@ class HomeViewModel @Inject constructor(
         }
     }
 }
+
+private data class RefreshSummary(
+    val isRefreshing: Boolean,
+    val hasRefreshFailure: Boolean
+)

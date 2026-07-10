@@ -20,6 +20,7 @@ import com.example.degreewiki.ui.components.DegreeWikiScreen
 import com.example.degreewiki.ui.components.EmptyState
 import com.example.degreewiki.ui.components.ErrorState
 import com.example.degreewiki.ui.components.LoadingState
+import com.example.degreewiki.ui.components.RefreshWarningNote
 import com.example.degreewiki.ui.components.ScreenHero
 import com.example.degreewiki.ui.components.SectionHeader
 import com.example.degreewiki.ui.components.StatusBadge
@@ -40,13 +41,14 @@ fun ProgramsScreen(
         )
         is DiscoveryUiState.Error -> ErrorState(
             title = "Programs unavailable",
-            message = "We could not load programs right now. Try again to refresh the current catalog.",
+            message = "We could not load programs right now. Check your connection and try again.",
             actionLabel = "Retry",
             onActionClick = viewModel::refresh,
             modifier = modifier
         )
         is DiscoveryUiState.Success -> {
-            val data = (state as DiscoveryUiState.Success<Program>).data
+            val successState = state as DiscoveryUiState.Success<Program>
+            val data = successState.data
             if (data.isEmpty()) {
                 EmptyState(
                     title = "No programs available",
@@ -68,6 +70,15 @@ fun ProgramsScreen(
                             title = "${data.size} programs available",
                             subtitle = "Open any card to view the cached detail screen."
                         )
+                    }
+                    if (successState.showRefreshWarning) {
+                        item {
+                            RefreshWarningNote(
+                                text = "Showing saved information. We could not refresh right now.",
+                                actionLabel = "Retry",
+                                onActionClick = viewModel::refresh
+                            )
+                        }
                     }
                     items(data, key = { it.id }) { program ->
                         ProgramCard(

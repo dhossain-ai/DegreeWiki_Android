@@ -7,8 +7,7 @@ import com.example.degreewiki.domain.model.University
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.catch
-import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -19,9 +18,20 @@ class UniversitiesViewModel @Inject constructor(
 ) : ViewModel() {
 
     val uiState: StateFlow<DiscoveryUiState<University>> =
-        dataRepository.universities
-            .map { DiscoveryUiState.Success(it) as DiscoveryUiState<University> }
-            .catch { emit(DiscoveryUiState.Error(it)) }
+        combine(
+            dataRepository.universities,
+            dataRepository.universityRefreshState
+        ) { universities, refreshState ->
+            when {
+                universities.isEmpty() && refreshState.isRefreshing -> DiscoveryUiState.Loading
+                universities.isEmpty() && refreshState.lastRefreshFailed -> DiscoveryUiState.Error
+                else -> DiscoveryUiState.Success(
+                    data = universities,
+                    showRefreshWarning = universities.isNotEmpty() && refreshState.lastRefreshFailed,
+                    isRefreshing = refreshState.isRefreshing
+                )
+            }
+        }
             .stateIn(
                 scope = viewModelScope,
                 started = SharingStarted.WhileSubscribed(5000),

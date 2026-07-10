@@ -13,22 +13,26 @@ Last updated: 2026-07-10
 - Auth: Supabase email/password session auth
 - Local storage: Room plus encrypted shared preferences for auth session
 
-## Bundle 3 Status
+## Bundle 4 Status
 
-- Bundle 3 state: completed
+- Bundle 4 state: completed
 - Home remains the first bottom-navigation tab
 - Current bottom navigation: `Home / Programs / Universities / Countries / Profile`
-- Detail screens now use the shared design foundation introduced in Bundle 2
-- Public browse flow from Bundle 1 and Bundle 2 is preserved
+- Detail screens still use the shared design foundation introduced in Bundle 2
+- Public browse flow from Bundle 1 through Bundle 3 is preserved
 
-## What Improved In Bundle 3
+## What Improved In Bundle 4
 
-- Restyled `ProgramDetailScreen`, `UniversityDetailScreen`, and `CountryDetailScreen` to use the shared shell, white cards, navy headings, slate supporting copy, and trust-note treatment.
-- Added omission-first detail rendering so missing fields are skipped instead of showing raw IDs, `null`, or made-up placeholders.
-- Added safe polished unavailable states with a student-friendly message and a back action.
-- Resolved university country display through existing cached country data when available, and omitted the field when it would otherwise have shown a raw ID.
-- Added low-risk related-content sections on university and country details using only current cached Android data.
-- Changed the narrow bottom-navigation label from `Destinations` to `Countries` so the label fits cleanly on narrower emulator widths.
+- `DataRepository` now tracks public refresh status explicitly instead of swallowing failures.
+- Programs, Universities, Countries, and Home now distinguish between:
+  - loading with no cache
+  - cached success
+  - cached success plus refresh warning
+  - no-cache refresh failure
+- Public list screens now keep cached content visible and show a subtle retryable warning when refresh fails.
+- Public list screens now show clearer full-page retry states when no cached data exists and refresh fails.
+- Home now shows a retryable warning when any public catalog refresh fails while cached data is still available.
+- Added low-risk test coverage for the friendly detail unavailable state copy.
 
 ## What Remains Basic Or Incomplete
 
@@ -36,7 +40,7 @@ Last updated: 2026-07-10
 - University detail still lacks official website data because that field is not available in the current Android model or API contract.
 - Country detail currently focuses on summary plus related cached universities/programs and does not include richer visa or cost content.
 - Home still does not implement real advanced search, Fit Finder, chat, scholarships, or guides.
-- Repository refresh methods still swallow exceptions, which limits richer error reporting.
+- Upstream text anomalies are still handled as source-data issues rather than aggressively sanitized in-app.
 
 ## Validation Results
 
@@ -52,14 +56,16 @@ Last updated: 2026-07-10
 - Verified on connected emulator `emulator-5554`
 - App opens and Home appears first
 - Bottom navigation shows `Home / Programs / Universities / Countries / Profile` without truncating the countries label
-- Programs list loads and program detail opens with the polished card-based layout
-- Universities list loads and university detail opens with location resolution plus related programs where cached matches exist
-- Destinations list loads and country detail opens with the polished shell and trust note
-- Back navigation from program, university, and country details returns safely to the prior browse surface
+- Programs list loads and program detail opens
+- Universities list loads and university detail opens
+- Destinations list loads and country detail opens
+- Back navigation from program, university, and country details returns safely
 - Profile opens and the fake Google sign-in button did not return
 - Home still presents Fit Finder and chat only as deferred/non-working product messaging
-- No fake tuition, deadline, source, scholarship, or admissions data was added by this bundle
+- With network disabled and cached data present, Home and public lists stayed visible and showed a friendly refresh warning instead of crashing
+- With network disabled and app data cleared, public screens showed a clear retryable error state instead of blank or misleading content
+- No stack traces, raw exception text, or fake data appeared in the UI
 
 ## Recommended Next Bundle
 
-Bundle 4 should focus on low-risk data-quality and state polish, especially better surfaced refresh failures and improved text handling for upstream content anomalies, without expanding the Android API surface.
+Bundle 5 should focus on low-risk public data quality polish, especially upstream text normalization strategy, targeted state coverage, and any remaining screen-level inconsistencies that can be fixed without expanding the Android API surface.

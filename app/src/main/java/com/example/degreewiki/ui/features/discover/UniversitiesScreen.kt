@@ -18,6 +18,7 @@ import com.example.degreewiki.ui.components.DegreeWikiScreen
 import com.example.degreewiki.ui.components.EmptyState
 import com.example.degreewiki.ui.components.ErrorState
 import com.example.degreewiki.ui.components.LoadingState
+import com.example.degreewiki.ui.components.RefreshWarningNote
 import com.example.degreewiki.ui.components.ScreenHero
 import com.example.degreewiki.ui.components.SectionHeader
 import com.example.degreewiki.ui.components.StatusBadge
@@ -38,13 +39,14 @@ fun UniversitiesScreen(
         )
         is DiscoveryUiState.Error -> ErrorState(
             title = "Universities unavailable",
-            message = "We could not load universities right now. Try again to refresh the current catalog.",
+            message = "We could not load universities right now. Check your connection and try again.",
             actionLabel = "Retry",
             onActionClick = viewModel::refresh,
             modifier = modifier
         )
         is DiscoveryUiState.Success -> {
-            val data = (state as DiscoveryUiState.Success<University>).data
+            val successState = state as DiscoveryUiState.Success<University>
+            val data = successState.data
             if (data.isEmpty()) {
                 EmptyState(
                     title = "No universities available",
@@ -66,6 +68,15 @@ fun UniversitiesScreen(
                             title = "${data.size} universities available",
                             subtitle = "Cards show only fields already available in the cache."
                         )
+                    }
+                    if (successState.showRefreshWarning) {
+                        item {
+                            RefreshWarningNote(
+                                text = "Showing saved information. We could not refresh right now.",
+                                actionLabel = "Retry",
+                                onActionClick = viewModel::refresh
+                            )
+                        }
                     }
                     items(data, key = { it.id }) { university ->
                         UniversityCard(

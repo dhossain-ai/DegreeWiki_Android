@@ -21,12 +21,14 @@ import com.example.degreewiki.ui.components.DegreeWikiScreen
 import com.example.degreewiki.ui.components.DeferredFeatureCard
 import com.example.degreewiki.ui.components.PrimaryActionButton
 import com.example.degreewiki.ui.components.QuickBrowseCard
+import com.example.degreewiki.ui.components.RefreshWarningNote
 import com.example.degreewiki.ui.components.ScreenHero
 import com.example.degreewiki.ui.components.SearchEntryCard
 import com.example.degreewiki.ui.components.SectionHeader
 import com.example.degreewiki.ui.components.StatusBadge
 import com.example.degreewiki.ui.components.StatusBadgeTone
 import com.example.degreewiki.ui.components.TrustNote
+import com.example.degreewiki.ui.components.ErrorState
 
 @Composable
 fun HomeScreen(
@@ -38,6 +40,17 @@ fun HomeScreen(
     viewModel: HomeViewModel = hiltViewModel()
 ) {
     val state by viewModel.uiState.collectAsStateWithLifecycle()
+
+    if (state.showFullError) {
+        ErrorState(
+            title = "Study-abroad data unavailable",
+            message = "We could not load study-abroad data right now. Check your connection and try again.",
+            actionLabel = "Retry",
+            onActionClick = viewModel::refresh,
+            modifier = modifier
+        )
+        return
+    }
 
     DegreeWikiScreen(modifier = modifier) {
         item {
@@ -57,6 +70,15 @@ fun HomeScreen(
             TrustNote(
                 text = "Source-aware study-abroad data. Always confirm final details on the official university or scholarship page before applying."
             )
+        }
+        if (state.showRefreshWarning) {
+            item {
+                RefreshWarningNote(
+                    text = "Showing saved information. We could not refresh right now.",
+                    actionLabel = "Retry",
+                    onActionClick = viewModel::refresh
+                )
+            }
         }
         item {
             SectionHeader(

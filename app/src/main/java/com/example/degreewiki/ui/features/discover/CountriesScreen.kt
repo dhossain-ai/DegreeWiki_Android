@@ -18,6 +18,7 @@ import com.example.degreewiki.ui.components.DegreeWikiScreen
 import com.example.degreewiki.ui.components.EmptyState
 import com.example.degreewiki.ui.components.ErrorState
 import com.example.degreewiki.ui.components.LoadingState
+import com.example.degreewiki.ui.components.RefreshWarningNote
 import com.example.degreewiki.ui.components.ScreenHero
 import com.example.degreewiki.ui.components.SectionHeader
 
@@ -36,13 +37,14 @@ fun CountriesScreen(
         )
         is DiscoveryUiState.Error -> ErrorState(
             title = "Destinations unavailable",
-            message = "We could not load destination data right now. Try again to refresh the current catalog.",
+            message = "We could not load destination data right now. Check your connection and try again.",
             actionLabel = "Retry",
             onActionClick = viewModel::refresh,
             modifier = modifier
         )
         is DiscoveryUiState.Success -> {
-            val data = (state as DiscoveryUiState.Success<Country>).data
+            val successState = state as DiscoveryUiState.Success<Country>
+            val data = successState.data
             if (data.isEmpty()) {
                 EmptyState(
                     title = "No destinations available",
@@ -64,6 +66,15 @@ fun CountriesScreen(
                             title = "${data.size} destinations available",
                             subtitle = "Open any destination for the safe cached detail view."
                         )
+                    }
+                    if (successState.showRefreshWarning) {
+                        item {
+                            RefreshWarningNote(
+                                text = "Showing saved information. We could not refresh right now.",
+                                actionLabel = "Retry",
+                                onActionClick = viewModel::refresh
+                            )
+                        }
                     }
                     items(data, key = { it.id }) { country ->
                         CountryCard(

@@ -1,6 +1,6 @@
 # Android Architecture
 
-Last audited: 2026-07-09
+Last audited: 2026-07-10
 
 ## High-Level Shape
 
@@ -82,8 +82,30 @@ Observed inconsistency:
 
 Observations:
 
-- `DataRepository` swallows refresh exceptions with `printStackTrace()`.
-- Because refresh failures do not propagate, list screens can stay in `Success(emptyList())` rather than a true error state.
+- `DataRepository` now owns small `StateFlow` refresh-status channels for programs, universities, and countries.
+- Each refresh path updates `PublicRefreshState(isRefreshing, lastRefreshFailed)` so ViewModels can distinguish:
+  - initial loading with no cached data
+  - cached-data success
+  - cached-data success plus refresh warning
+  - no-cache refresh failure
+- Refresh failures are intentionally converted into simple UI-safe state rather than surfacing raw exception messages or stack traces.
+
+## Public Data Refresh Pattern
+
+Public catalog screens now follow a cache-first pattern:
+
+1. Room-backed list flow emits cached content if available
+2. ViewModel triggers repository refresh on init or retry
+3. Repository updates the matching refresh-status flow
+4. ViewModel combines cached data plus refresh status into UI state
+
+UI behavior:
+
+- If cached data exists and refresh fails, the screen stays usable and shows a subtle warning with retry.
+- If no cached data exists and refresh fails, the screen shows a full error state with retry.
+- Home aggregates the three public refresh-status flows and shows either:
+  - a non-blocking refresh warning when any public catalog fails but cached data exists
+  - a full-page error only when all visible public content is empty and refresh has failed
 
 ## Local Data Layer
 
@@ -142,6 +164,7 @@ That means:
 
 Verified test state:
 
-- existing unit and instrumented tests are stale
-- test files reference removed or nonexistent screen/viewmodel contracts
-- tests are currently a repo health issue, not a reliable safety net
+- mapper unit tests pass
+- bottom-navigation instrumented coverage exists
+- detail unavailable-state instrumented coverage exists
+- the test surface is still light and focused on low-risk UI/state checks rather than deep integration coverage

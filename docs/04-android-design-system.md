@@ -17,6 +17,7 @@ Last audited: 2026-07-10
 - `DegreeWikiCard`
 - `SectionHeader`
 - `TrustNote`
+- `RefreshWarningNote`
 - `StatusBadge`
 - `PrimaryActionButton`
 - `EmptyState`
@@ -36,6 +37,7 @@ These live in `app/src/main/java/com/example/degreewiki/ui/components/DegreeWiki
 - Use white cards with rounded corners, modest shadow, and enough padding for dense study-abroad data.
 - Keep list cards factual and compact. Show only fields already available from API/cache-backed models.
 - Use shared empty, loading, and error states instead of ad hoc centered text.
+- Use a subtle inline warning note when cached public data is still visible but refresh failed.
 - Keep trust copy compact and source-aware.
 - Avoid making unfinished surfaces feel like live product features.
 
@@ -45,6 +47,7 @@ These live in `app/src/main/java/com/example/degreewiki/ui/components/DegreeWiki
 - Start each detail view with a simple back app bar and a top hero card that anchors the page around the current record.
 - Follow the hero card with optional fact cards, optional text sections, optional related-content cards, and a trust note in that order when data exists.
 - Use `TrustNote` for source-aware reminders only. It must not imply verification or editorial review.
+- Use `RefreshWarningNote` for reliability messaging such as “Showing saved information. We could not refresh right now.”
 - Use `PrimaryActionButton` only for a safe navigation action such as returning to the browse list.
 - Related programs or universities may be shown only when they can be derived from the current cached Android data flow without adding new endpoints or fake joins.
 
@@ -61,3 +64,4 @@ These live in `app/src/main/java/com/example/degreewiki/ui/components/DegreeWiki
 - Detail screens now use the shared shell, but only the fields already present in the current Android models can be rendered.
 - Bottom navigation now uses the shorter `Countries` label to avoid truncation on narrow devices.
 - Typography still relies on system sans-serif rather than a bundled product type family.
+- Upstream text anomalies are still documented as source-data issues unless a future sanitizer can be proven conservative and safe.

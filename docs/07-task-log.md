@@ -1,34 +1,37 @@
 # Android Task Log
 
-## 2026-07-10 - Bundle 3 Detail Screens + Narrow App Shell Polish
+## 2026-07-10 - Bundle 4 Public Data Reliability + Error State Polish
 
-- Scoped work to public detail-screen polish plus the narrow-device bottom navigation issue.
-- Rebuilt Program, University, and Country detail screens on top of the shared Bundle 2 shell and card components.
-- Added shared detail helper composables for hero cards, fact cards, related-content cards, trust notes, back app bars, and polished unavailable states.
-- Kept detail rendering omission-first so missing values are skipped instead of guessed, padded, or exposed as raw IDs.
-- Resolved university country names from existing cached country records and suppressed raw `countryId` display when no safe match exists.
-- Added related-program and related-university sections only when current cached Android data could derive them safely.
-- Changed the bottom navigation label from `Destinations` to `Countries` to fit narrow emulator widths more cleanly.
-- Preserved Home-first behavior, public browse loading, safe detail taps, and the absence of fake Chat, Fit Finder, scholarship, guide, or Google sign-in surfaces.
+- Scoped work to public refresh reliability and honest state handling only.
+- Added repository-owned `PublicRefreshState` flows for programs, universities, and countries so refresh failures are no longer silently swallowed.
+- Kept cache-first Room rendering intact while exposing refresh failure state to ViewModels.
+- Updated Home plus the Programs, Universities, and Countries browse ViewModels to distinguish loading, cached success, cached success with warning, and no-cache error cases.
+- Added a shared `RefreshWarningNote` component for subtle retryable cached-data warnings.
+- Updated Home and list screens to keep cached data visible when refresh fails and to show full-page retry states only when no cached data exists.
+- Added a low-risk instrumented test for friendly detail unavailable-state copy.
+- Chose not to add a generic text sanitizer for the upstream encoding artifact because a safe non-lossy rule was not obvious; the issue remains documented as source-data quality.
 
 ## Files Created
 
-- `app/src/main/java/com/example/degreewiki/ui/features/details/DetailScreenComponents.kt`
+- `app/src/androidTest/java/com/example/degreewiki/ui/features/details/DetailUnavailableStateTest.kt`
 
 ## Files Modified
 
-- `app/src/androidTest/java/com/example/degreewiki/ui/features/main/BottomNavigationBarTest.kt`
-- `app/src/main/java/com/example/degreewiki/ui/features/details/CountryDetailScreen.kt`
-- `app/src/main/java/com/example/degreewiki/ui/features/details/CountryDetailViewModel.kt`
-- `app/src/main/java/com/example/degreewiki/ui/features/details/ProgramDetailScreen.kt`
-- `app/src/main/java/com/example/degreewiki/ui/features/details/ProgramDetailViewModel.kt`
-- `app/src/main/java/com/example/degreewiki/ui/features/details/UniversityDetailScreen.kt`
-- `app/src/main/java/com/example/degreewiki/ui/features/details/UniversityDetailViewModel.kt`
-- `app/src/main/java/com/example/degreewiki/ui/features/main/BottomNavigationBar.kt`
+- `app/src/main/java/com/example/degreewiki/data/repository/DataRepository.kt`
+- `app/src/main/java/com/example/degreewiki/ui/components/DegreeWikiComponents.kt`
+- `app/src/main/java/com/example/degreewiki/ui/features/discover/CountriesScreen.kt`
+- `app/src/main/java/com/example/degreewiki/ui/features/discover/CountriesViewModel.kt`
+- `app/src/main/java/com/example/degreewiki/ui/features/discover/DiscoveryUiState.kt`
+- `app/src/main/java/com/example/degreewiki/ui/features/discover/ProgramsScreen.kt`
+- `app/src/main/java/com/example/degreewiki/ui/features/discover/ProgramsViewModel.kt`
+- `app/src/main/java/com/example/degreewiki/ui/features/discover/UniversitiesScreen.kt`
+- `app/src/main/java/com/example/degreewiki/ui/features/discover/UniversitiesViewModel.kt`
+- `app/src/main/java/com/example/degreewiki/ui/features/home/HomeScreen.kt`
+- `app/src/main/java/com/example/degreewiki/ui/features/home/HomeViewModel.kt`
+- `docs/02-android-architecture.md`
 - `docs/04-android-design-system.md`
 - `docs/06-status.md`
 - `docs/07-task-log.md`
-- `docs/08-android-product-flow-map.md`
 
 ## Files Deleted
 
@@ -44,31 +47,32 @@
 - no Room migration changes
 - no auth storage redesign
 - no network logging changes
-- no repository architecture rewrite
+- no broad repository architecture rewrite
 - no new API fields such as official website, deadlines, languages, or visa content where Android models do not already expose them
+- no generic text sanitizer that could risk corrupting legitimate names
+- no global offline sync system
 
 ## Validation Results
 
 - `./gradlew.bat test` passed
 - `./gradlew.bat build` passed
 - `./gradlew.bat lint` passed
-- An initial parallel validation attempt caused generated-file collisions in Gradle/KSP/Hilt on Windows; rerunning the required commands sequentially after `./gradlew.bat --stop` and `./gradlew.bat clean` passed cleanly
 
 ## Manual QA Results
 
 - Installed the fresh debug APK on emulator `emulator-5554`
-- Verified Home renders first and the bottom navigation now shows `Countries` without truncation
-- Verified Programs list loads and the first program detail opens with the new hero card, facts card, trust note, and back CTA
-- Verified Universities list loads and a university detail opens with safe country-name resolution plus related cached programs
-- Verified Destinations list loads and a country detail opens with the new shell and trust note
+- Verified Home renders first
+- Verified Programs, Universities, and Destinations lists load
+- Verified program, university, and country detail screens still open safely
 - Verified back navigation from each opened detail returns safely
 - Verified Profile opens and did not reintroduce the fake Google sign-in button
 - Verified Home still keeps Chat and Fit Finder in deferred/non-working messaging only
-- Verified no fake deadline, verification, source, or admissions fields appeared in the new detail views
+- Disabled emulator Wi-Fi and mobile data with cached data present, relaunched the app, and verified Home plus public browse screens remained visible with a friendly refresh warning
+- Cleared app data while offline, reopened the app, and verified public no-cache surfaces showed retryable error states instead of blank content
+- Verified no stack traces, raw exception text, or fake data appeared in the UI
 
 ## Known Issues
 
-- Repository refresh failures are still swallowed
 - Auth storage still uses deprecated Android security APIs
 - Network logging is still set to `BODY`
 - Room still uses destructive migration fallback
@@ -76,5 +80,5 @@
 
 ## Next Recommended Bundle
 
-- Improve refresh/error surfacing and data-quality handling without expanding the API surface
-- Add targeted tests for detail unavailable states and cache-derived related-content rendering
+- Add targeted tests for the new refresh warning/error-state behavior
+- Revisit upstream text normalization only with a clearly safe, conservative rule or upstream API fix
