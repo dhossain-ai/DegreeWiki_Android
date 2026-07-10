@@ -1,20 +1,53 @@
 # Android API Contract
 
-Last audited: 2026-07-09
+Last audited: 2026-07-11
 
 ## Rule
 
-This file lists only endpoints and fields verified in the Android repo source. It does not speculate beyond the current client contract.
+This file records only contract surface verified from the Android repo and the checked web repo at `W:\DegreeWiki`. This audit made no web repo changes.
 
 ## Runtime Base URL
 
 - Base URL comes from `BuildConfig.API_BASE_URL`
 - Value is injected from `local.properties`
-- Exact environment value was not documented here on purpose
+- Exact environment value is intentionally not stored here
 
-## Verified Endpoints In Use
+## Verified Android Public Data Usage
 
-### Public Or Optional Auth
+### Endpoints actively used by Android public browse flows
+
+`GET /api/mobile/programs`
+
+- Called by `DefaultDataRepository.refreshPrograms()`
+- DTO: `ProgramDto`
+- Android cache target: `ProgramEntity`
+- Used by:
+  - Programs list
+  - Program detail
+  - University detail related-program lookup
+  - Country detail related-program lookup
+
+`GET /api/mobile/universities`
+
+- Called by `DefaultDataRepository.refreshUniversities()`
+- DTO: `UniversityDto`
+- Android cache target: `UniversityEntity`
+- Used by:
+  - Universities list
+  - University detail
+  - Country detail related-university lookup
+
+`GET /api/mobile/countries`
+
+- Called by `DefaultDataRepository.refreshCountries()`
+- DTO: `CountryDto`
+- Android cache target: `CountryEntity`
+- Used by:
+  - Countries list
+  - Country detail
+  - University detail country-name resolution
+
+### Endpoints declared in Android but not verified in current public UI flows
 
 `GET /api/mobile/bootstrap`
 
@@ -22,8 +55,9 @@ This file lists only endpoints and fields verified in the Android repo source. I
   - `ok: Boolean`
   - `siteName: String`
   - `featureFlags: Map<String, Boolean>`
-- Verified in API interface
-- Not verified as used by any current screen/view model
+- Declared in `DegreeWikiApiService`
+- Not verified as used by current Android screens
+- Matching route file was not found in checked web repo source during this audit
 
 `GET /api/mobile/programs/search`
 
@@ -36,25 +70,11 @@ This file lists only endpoints and fields verified in the Android repo source. I
   - `pageSize: Int`
   - `total: Int`
   - `nextPage: Int?`
-- Verified in API interface
-- Not verified as used by any current screen/view model
+- Declared in `DegreeWikiApiService`
+- Not verified as used by current Android screens
+- Matching route file was not found in checked web repo source during this audit
 
-`GET /api/mobile/programs`
-
-- Response model:
-  list of `ProgramDto`
-
-`GET /api/mobile/countries`
-
-- Response model:
-  list of `CountryDto`
-
-`GET /api/mobile/universities`
-
-- Response model:
-  list of `UniversityDto`
-
-### Auth Required
+### Auth-required endpoints declared in Android
 
 `GET /api/mobile/me`
 
@@ -63,22 +83,30 @@ This file lists only endpoints and fields verified in the Android repo source. I
   - `email: String`
   - `name: String`
   - `role: String`
+- Used by auth/profile flows, not by current public browse flows
+- Matching route file was not found in checked web repo source during this audit
 
 `GET /api/mobile/me/saved-items`
 
 - Response model:
-  list of `SavedItemDto`
+  - list of `SavedItemDto`
+- Used by signed-in saved-items flows, not by current public browse flows
+- Matching route file was not found in checked web repo source during this audit
 
 `DELETE /api/mobile/me/saved-items/{id}`
 
 - Path param:
   - `id: String`
 - Response body:
-  not modeled in client
+  - not modeled in client
+- Used by signed-in saved-items flows, not by current public browse flows
+- Matching route file was not found in checked web repo source during this audit
 
-## Verified DTOs
+## Verified DTOs And Cache Shapes
 
-### ProgramDto
+### Program contract
+
+`ProgramDto`
 
 - `id: String`
 - `slug: String`
@@ -90,7 +118,46 @@ This file lists only endpoints and fields verified in the Android repo source. I
 - `tuition: Double?`
 - `duration: String?`
 
-### UniversityDto
+`ProgramEntity`
+
+- `id`
+- `slug`
+- `title`
+- `universityName`
+- `countryName`
+- `degreeLevel`
+- `subject`
+- `tuition`
+- `duration`
+- `offlineSavedAt`
+
+Current Android program rendering:
+
+- List shows: title, university name, country name, degree level, subject, duration
+- Detail shows: title, university name, country name, degree level, subject, duration, tuition
+
+Verified missing public fields versus web:
+
+- no university id/slug in Android program DTO
+- no country id/code in Android program DTO
+- no city/location
+- no language
+- no study mode
+- no delivery mode
+- no tuition currency or tuition period
+- no application fee
+- no intake or deadline data
+- no application or official URL
+- no requirements fields
+- no curriculum or career outcomes
+- no verification metadata
+- no thumbnail/logo/media URL
+- no scholarship cue
+- no saved-state flag in public program payload
+
+### University contract
+
+`UniversityDto`
 
 - `id: String`
 - `slug: String`
@@ -100,7 +167,38 @@ This file lists only endpoints and fields verified in the Android repo source. I
 - `logoUrl: String?`
 - `overview: String?`
 
-### CountryDto
+`UniversityEntity`
+
+- `id`
+- `slug`
+- `name`
+- `countryId`
+- `city`
+- `logoUrl`
+- `overview`
+- `offlineSavedAt`
+
+Current Android university rendering:
+
+- List shows: name, city, overview fallback text
+- Detail shows: name, resolved country name when cached, city, overview, related cached program titles
+
+Verified missing public fields versus web:
+
+- no short name or native name
+- no official URL
+- no admissions/application URLs
+- no verification metadata
+- no ranking summary
+- no campus summary
+- no admissions/international/student-support sections
+- no scholarship/housing/language/career support summaries
+- no media beyond a single logo URL
+- no source confidence or last verified label
+
+### Country contract
+
+`CountryDto`
 
 - `id: String`
 - `slug: String`
@@ -108,39 +206,94 @@ This file lists only endpoints and fields verified in the Android repo source. I
 - `summary: String?`
 - `imageUrl: String?`
 
-### UserProfileDto
+`CountryEntity`
 
-- `id: String`
-- `email: String`
-- `name: String`
-- `role: String`
+- `id`
+- `slug`
+- `name`
+- `summary`
+- `imageUrl`
+- `offlineSavedAt`
 
-### SavedItemDto
+Current Android country rendering:
 
-- `id: String`
-- `entityType: String`
-- `entityId: String`
-- `title: String`
-- `slug: String`
-- `thumbnail: String?`
-- `savedAt: Long`
+- List shows: name, summary or fallback text
+- Detail shows: name, summary, related cached universities, related cached programs
 
-## Auth Contract
+Verified missing public fields versus web:
 
-- Supabase auth session determines logged-in state
-- Protected API calls use `Authorization: Bearer <access_token>` when a session exists
-- Auth token injection is automatic via `AuthInterceptor`
+- no ISO code
+- no capital/currency/language facts
+- no tuition or living-cost overview
+- no visa/student-work/post-study-work guidance
+- no scholarship or intake overview
+- no official education or visa URL
+- no FAQ payload
+- no verification metadata
+- no source confidence or last verified label
 
-## Verified Client Gaps
+## Verified Web Mobile Routes
 
-- No Android client call for `POST /api/mobile/me/saved-items`
-- No Android client call for program detail by slug or id
-- No Android client call for university detail by slug or id
-- No Android client call for country detail by slug or id
-- No Android client call for chat or fit finder endpoints
+The checked web repo currently contains these public mobile route files:
 
-## Contract Mismatch Risks
+- `GET /api/mobile/programs`
+- `GET /api/mobile/universities`
+- `GET /api/mobile/countries`
 
-- `UniversityDto` exposes `countryId`, but the detail UI currently displays that raw value directly rather than a resolved country name.
-- Search/bootstrap DTOs exist without active UI integration, so they should be treated as available contract surface, not shipped user flows.
-- Because `Json { ignoreUnknownKeys = true }` is enabled, additive backend fields will be ignored silently by the current client.
+Verified route behavior:
+
+- `programs.ts` returns a thin list payload shaped exactly for the current Android DTO.
+- `universities.ts` returns a thin list payload shaped exactly for the current Android DTO.
+- `countries.ts` returns a thin list payload shaped exactly for the current Android DTO.
+
+## Verified Web Richer Public Surfaces
+
+The checked public web pages query substantially richer fields directly from Supabase than the current mobile routes expose.
+
+Highlights:
+
+- Program list pages already use language, location, duration, tuition range, verification status, last verified date, logo/media, and deadline-style display cues.
+- Program detail pages additionally use official/application URLs, application fee, admissions requirements, English requirements, GPA requirements, curriculum, career outcomes, and intake/deadline records.
+- University list pages already use official URL, ranking summary, verification status, source-check date, and program-count context.
+- University detail pages additionally use short/native names, admissions links, language requirement overview, scholarship overview, housing overview, student life, international student support, and career support.
+- Destination detail pages additionally use ISO/currency/capital/language facts, tuition and living-cost ranges, visa and work guidance, official URLs, FAQ data, and verification metadata.
+- Scholarships and guides have public web list/detail pages, but no matching Android public flow and no verified `src/pages/api/mobile` route files for them.
+
+## Future Endpoint Recommendations
+
+Recommended additions should be new mobile-safe endpoints or expanded mobile payloads, not direct reuse of full web page queries.
+
+Priority 1:
+
+- Add program detail-capable mobile fields:
+  - `language`
+  - `studyMode`
+  - `deliveryMode`
+  - `city`
+  - `tuitionCurrency`
+  - `tuitionPeriod`
+  - `officialUrl`
+  - `applicationUrl`
+  - `verificationStatus`
+  - `lastVerifiedAt`
+
+Priority 2:
+
+- Add structured detail fields for:
+  - program intakes/deadlines
+  - requirements
+  - university links and support summaries
+  - destination tuition/living/visa/work guidance
+
+Priority 3:
+
+- Add dedicated mobile endpoints for scholarships and guides instead of overloading existing list routes.
+
+## Verified Gaps And Mismatch Risks
+
+- Android public detail screens are cache lookups over list payloads, not true detail endpoints.
+- Android declares `/api/mobile/bootstrap` and `/api/mobile/programs/search`, but matching route files were not found in the checked web repo source.
+- Android declares `/api/mobile/me` and `/api/mobile/me/saved-items`, but matching route files were not found in the checked web repo source.
+- The public web app supports authenticated save actions through `/api/saved-items/program`, which is a different route shape from the Android saved-items contract.
+- `UniversityDto.countryId` is useful for cache joins, but Android must resolve it through cached countries because the university payload does not include country name.
+- `Json { ignoreUnknownKeys = true }` means additive backend fields will be ignored safely until Android DTOs are updated.

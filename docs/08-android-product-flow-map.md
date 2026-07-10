@@ -1,38 +1,44 @@
 # Android Product Flow Map
 
-Last updated: 2026-07-10
+Last updated: 2026-07-11
 
 ## A. Purpose
 
-This file maps the current DegreeWiki Android public flow so future bundles stay aligned with the student-first browse product.
+This file maps the current DegreeWiki Android public flow after the Bundle 5 contract audit.
 
 ## B. Public Access Without Login
 
 Public users can currently access:
 
 - Home
-- Programs
-- Program details
-- Universities
-- University details
-- Destinations
-- Country details
+- Programs list
+- Program detail
+- Universities list
+- University detail
+- Destinations list
+- Country detail
 
-Public users may later access, once implemented safely:
+## C. Current Public Data Flow
 
-- Scholarships
-- Guides and articles
-- Search/filter improvements
-- Compare or save-related flows where product rules allow
+Public browse is currently a collection-cache-detail loop, not a list-plus-detail-endpoint model.
 
-## C. Login-Required Access
+Flow:
 
-Login is still required for:
+1. Screen ViewModel triggers `DataRepository.refreshPrograms()`, `refreshUniversities()`, or `refreshCountries()`.
+2. Repository calls one thin collection mobile endpoint:
+   - `/api/mobile/programs`
+   - `/api/mobile/universities`
+   - `/api/mobile/countries`
+3. DTOs are mapped directly into Room entities.
+4. Lists render from Room-backed flows.
+5. Detail screens load by cached `id` lookup only.
+6. University and country details derive a little extra context by joining other cached collections.
 
-- Saved-item account flows
-- Personalized profile content
-- Fit Finder follow-up flows when implemented
-- Chat/history flows when implemented
+Implications:
+
+- No Android public detail endpoint is currently called.
+- Rich web-only detail fields cannot appear on Android until the mobile API and Android DTO/cache contract expand.
+- Android correctly omits missing fields instead of fabricating them.
 
 ## D. Bottom Navigation
 
@@ -44,58 +50,56 @@ Current bottom navigation:
 - Countries
 - Profile
 
-Chat is not a bottom tab.
-
-Fit Finder is not a bottom tab.
-
-Scholarships and Guides are not bottom tabs.
-
-## E. Home Surface
-
-Home is now the target first tab and current app entry surface.
-
-Home currently includes:
-
-- DegreeWiki heading and intro copy
-- search-entry card routed into Programs browse
-- trust/source note
-- quick browse cards for Programs, Universities, and Destinations
-- real featured content only when cache-backed data already exists
-- deferred messaging for Fit Finder, scholarships, guides, and question/help
-
-## F. Deferred Public Surfaces
-
-- Fit Finder remains a future CTA, not a working Android feature
-- Chat remains a future small help surface, not a main dashboard
-- Scholarships and Guides remain future public surfaces until safe Android routes exist
-
-## G. Data Truth Rule
-
-Android must show only API or cache-backed data.
-
-Do not invent:
-
-- programs
-- universities
-- destinations
-- scholarships
-- tuition
-- deadlines
-- verification/source claims
-- AI or Fit Finder results
-
-## H. Detail Screen Behavior
+## E. Detail Screen Behavior
 
 Current behavior:
 
-- Program detail uses the shared mobile shell and shows only title, university, country, degree level, subject, duration, and tuition when present.
-- University detail uses the shared shell, resolves country names from cached country records when possible, omits raw IDs, and may show related cached programs.
-- Country detail uses the shared shell, shows the cached summary, and may show related cached universities and programs when the current Android cache can derive them safely.
-- Missing fields are omitted rather than padded with placeholders or fake facts.
-- When detail data is unavailable, the screen shows a student-friendly unavailable state with a safe back action.
+- Program detail shows only cached program fields: title, university, country, degree level, subject, duration, tuition.
+- University detail shows cached university fields plus resolved country name and related cached program titles.
+- Country detail shows cached summary plus related cached universities and programs.
+- Missing fields are omitted instead of replaced with fake placeholders.
+- Unavailable records show a safe fallback state with back navigation.
 
-Future richer API-backed behavior:
+## F. Web-To-Android Gap
 
-- Program detail may later expand to languages, delivery mode, intake/deadline, requirements, and official links only when those fields exist in the Android contract.
-- University detail may later add official website and richer institution metadata once the Android model exposes them.
-- Country detail may later add richer destination guidance only after official, structured Android-backed fields exist for it.
+The public web app already shows richer information than Android can currently render.
+
+Not yet available in the Android public contract:
+
+- program language, study mode, delivery mode, city, official links, deadlines, requirements, curriculum, career outcomes, verification metadata
+- university official links, ranking, admissions links, support/housing/scholarship/language/career sections, verification metadata
+- destination ISO/currency/capital facts, tuition and living-cost guidance, visa/work guidance, official URLs, FAQ, verification metadata
+
+## G. Deferred Public Surfaces
+
+These still remain future Android work:
+
+- Scholarships
+- Guides and articles
+- Search/filter UX built on live public endpoints
+- Fit Finder
+- Chat
+
+## H. Data Truth Rule
+
+Android must show only API-backed or cache-backed data.
+
+Do not invent:
+
+- tuition
+- deadlines
+- verification labels
+- source-checked dates
+- visa guidance
+- scholarship availability
+- guide content
+- related content not backed by current cache
+
+## I. Next Flow Recommendation
+
+The next safe product step is to keep the current flow shape but expand the mobile contract deliberately:
+
+1. add structured public detail fields to the mobile API
+2. update Android DTOs/entities/mappers
+3. render only newly verified fields
+4. add scholarships/guides only after dedicated mobile-safe endpoints exist
