@@ -29,7 +29,7 @@ class BottomNavigationBarTest {
         composeTestRule.onNodeWithText("Home").assertExists()
         composeTestRule.onNodeWithText("Programs").assertExists()
         composeTestRule.onNodeWithText("Universities").assertExists()
-        composeTestRule.onNodeWithText("Destinations").assertExists()
+        composeTestRule.onNodeWithText("Countries").assertExists()
         composeTestRule.onNodeWithText("Profile").assertExists()
     }
 
@@ -44,7 +44,7 @@ class BottomNavigationBarTest {
         }
 
         composeTestRule.onNodeWithText("Profile").performClick()
-        composeTestRule.onNodeWithText("Destinations").performClick()
-        composeTestRule.onNodeWithText("Destinations").assertExists()
+        composeTestRule.onNodeWithText("Countries").performClick()
+        composeTestRule.onNodeWithText("Countries").assertExists()
     }
 }

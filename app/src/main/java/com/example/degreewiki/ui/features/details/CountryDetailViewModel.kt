@@ -1,6 +1,5 @@
 package com.example.degreewiki.ui.features.details
 
-import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.degreewiki.data.repository.DataRepository
@@ -12,11 +11,13 @@ import dagger.assisted.AssistedInject
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 
 data class CountryDetailUiState(
     val country: Country? = null,
+    val relatedUniversities: List<String> = emptyList(),
+    val relatedPrograms: List<String> = emptyList(),
     val isLoading: Boolean = true
 )
 
@@ -26,8 +27,42 @@ class CountryDetailViewModel @AssistedInject constructor(
     dataRepository: DataRepository
 ) : ViewModel() {
 
-    val uiState: StateFlow<CountryDetailUiState> = dataRepository.getCountryById(navKey.id)
-        .map { CountryDetailUiState(country = it, isLoading = false) }
+    val uiState: StateFlow<CountryDetailUiState> = combine(
+        dataRepository.getCountryById(navKey.id),
+        dataRepository.universities,
+        dataRepository.programs
+    ) { country, universities, programs ->
+        val relatedUniversities = country?.id
+            ?.let { countryId ->
+                universities
+                    .asSequence()
+                    .filter { it.countryId == countryId }
+                    .map { it.name }
+                    .distinct()
+                    .take(4)
+                    .toList()
+            }
+            .orEmpty()
+
+        val relatedPrograms = country?.name
+            ?.let { countryName ->
+                programs
+                    .asSequence()
+                    .filter { it.countryName.equals(countryName, ignoreCase = true) }
+                    .map { "${it.title} • ${it.universityName}" }
+                    .distinct()
+                    .take(4)
+                    .toList()
+            }
+            .orEmpty()
+
+        CountryDetailUiState(
+            country = country,
+            relatedUniversities = relatedUniversities,
+            relatedPrograms = relatedPrograms,
+            isLoading = false
+        )
+    }
         .stateIn(
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(5000),

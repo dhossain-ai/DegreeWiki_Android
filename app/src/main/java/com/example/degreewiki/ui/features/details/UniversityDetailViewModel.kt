@@ -1,6 +1,5 @@
 package com.example.degreewiki.ui.features.details
 
-import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.degreewiki.data.repository.DataRepository
@@ -12,11 +11,13 @@ import dagger.assisted.AssistedInject
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 
 data class UniversityDetailUiState(
     val university: University? = null,
+    val countryName: String? = null,
+    val relatedPrograms: List<String> = emptyList(),
     val isLoading: Boolean = true
 )
 
@@ -26,8 +27,34 @@ class UniversityDetailViewModel @AssistedInject constructor(
     dataRepository: DataRepository
 ) : ViewModel() {
 
-    val uiState: StateFlow<UniversityDetailUiState> = dataRepository.getUniversityById(navKey.id)
-        .map { UniversityDetailUiState(university = it, isLoading = false) }
+    val uiState: StateFlow<UniversityDetailUiState> = combine(
+        dataRepository.getUniversityById(navKey.id),
+        dataRepository.countries,
+        dataRepository.programs
+    ) { university, countries, programs ->
+        val countryName = university?.countryId
+            ?.takeUnless { it.isBlank() }
+            ?.let { countryId -> countries.firstOrNull { it.id == countryId }?.name }
+
+        val relatedPrograms = university?.name
+            ?.let { universityName ->
+                programs
+                    .asSequence()
+                    .filter { it.universityName.equals(universityName, ignoreCase = true) }
+                    .map { it.title }
+                    .distinct()
+                    .take(4)
+                    .toList()
+            }
+            .orEmpty()
+
+        UniversityDetailUiState(
+            university = university,
+            countryName = countryName,
+            relatedPrograms = relatedPrograms,
+            isLoading = false
+        )
+    }
         .stateIn(
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(5000),

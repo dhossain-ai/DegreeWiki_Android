@@ -39,15 +39,25 @@ These live in `app/src/main/java/com/example/degreewiki/ui/components/DegreeWiki
 - Keep trust copy compact and source-aware.
 - Avoid making unfinished surfaces feel like live product features.
 
+## Detail Screen Layout Rules
+
+- Program, university, and country detail screens should reuse the shared shell with the same warm off-white background and white card treatment used on Home and browse lists.
+- Start each detail view with a simple back app bar and a top hero card that anchors the page around the current record.
+- Follow the hero card with optional fact cards, optional text sections, optional related-content cards, and a trust note in that order when data exists.
+- Use `TrustNote` for source-aware reminders only. It must not imply verification or editorial review.
+- Use `PrimaryActionButton` only for a safe navigation action such as returning to the browse list.
+- Related programs or universities may be shown only when they can be derived from the current cached Android data flow without adding new endpoints or fake joins.
+
 ## No-Fake-Data Rule
 
 - Do not invent programs, universities, destinations, scholarships, tuition, deadlines, or source metadata.
 - Do not use green badges to imply verification unless that status is truly backed by data.
 - Real API/cache-backed content may be labeled neutrally, but not presented as formally verified.
 - Deferred surfaces such as chat, Fit Finder, scholarships, and guides must stay clearly planned or login-gated until real Android flows exist.
+- On detail screens, missing fields must be omitted instead of replaced with guessed values, raw IDs, `null`, or placeholder fact rows.
 
 ## Current Gaps
 
-- Detail screens still use older layouts and have not been fully brought onto the shared shell.
-- Bottom navigation uses truncation on narrow devices to keep `Destinations` on one line.
+- Detail screens now use the shared shell, but only the fields already present in the current Android models can be rendered.
+- Bottom navigation now uses the shorter `Countries` label to avoid truncation on narrow devices.
 - Typography still relies on system sans-serif rather than a bundled product type family.

@@ -45,7 +45,7 @@ fun BottomNavigationBar(
         )
         NavigationBarItem(
             icon = { Icon(Icons.Default.LocationOn, contentDescription = "Countries") },
-            label = { Text("Destinations", maxLines = 1, overflow = TextOverflow.Ellipsis) },
+            label = { Text("Countries", maxLines = 1, overflow = TextOverflow.Ellipsis) },
             selected = currentTab == DiscoveryTab.COUNTRIES,
             onClick = { onTabSelected(DiscoveryTab.COUNTRIES) }
         )

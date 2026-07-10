@@ -1,18 +1,15 @@
 package com.example.degreewiki.ui.features.details
 
-import androidx.compose.foundation.layout.*
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material3.*
+import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
+import androidx.compose.foundation.layout.padding
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.example.degreewiki.ui.components.DegreeWikiScreen
+import com.example.degreewiki.ui.components.LoadingState
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun UniversityDetailScreen(
     navKey: com.example.degreewiki.ui.navigation.UniversityDetail,
@@ -25,87 +22,83 @@ fun UniversityDetailScreen(
 
     Scaffold(
         topBar = {
-            TopAppBar(
-                title = { Text(uiState.university?.name ?: "University Details") },
-                navigationIcon = {
-                    IconButton(onClick = onBackClick) {
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "Navigate back"
-                        )
-                    }
-                }
+            DetailTopAppBar(
+                title = uiState.university?.name ?: "University details",
+                onBackClick = onBackClick
             )
         }
     ) { innerPadding ->
-        if (uiState.isLoading) {
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(innerPadding),
-                contentAlignment = Alignment.Center
-            ) {
-                CircularProgressIndicator()
-            }
-        } else if (uiState.university != null) {
-            val university = uiState.university!!
-            Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(innerPadding)
-                    .padding(16.dp),
-                verticalArrangement = Arrangement.spacedBy(16.dp)
-            ) {
-                ElevatedCard(
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    Column(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(16.dp),
-                        verticalArrangement = Arrangement.spacedBy(8.dp)
-                    ) {
-                        Text(
-                            text = university.name,
-                            style = MaterialTheme.typography.headlineMedium
-                        )
-                        university.city?.let {
-                            DetailRow(label = "City", value = it)
-                        }
-                    }
-                }
+        when {
+            uiState.isLoading -> LoadingState(
+                modifier = Modifier.padding(innerPadding),
+                label = "Loading university details"
+            )
 
-                university.overview?.let {
-                    ElevatedCard(
-                        modifier = Modifier.fillMaxWidth()
-                    ) {
-                        Column(
-                            modifier = Modifier.padding(16.dp),
-                            verticalArrangement = Arrangement.spacedBy(8.dp)
-                        ) {
-                            Text(
-                                text = "Overview",
-                                style = MaterialTheme.typography.titleMedium
-                            )
-                            Text(
-                                text = it,
-                                style = MaterialTheme.typography.bodyMedium
-                            )
-                        }
-                    }
-                }
-
-                Text(
-                    text = "Details can change. Confirm final information on the official source before applying.",
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
-            }
-        } else {
-            DetailUnavailableState(
-                message = "We could not load this university right now.",
+            uiState.university == null -> DetailUnavailableState(
+                title = "University unavailable",
+                message = "We could not load this university right now. Go back and try opening it again.",
+                actionLabel = "Go back",
+                onActionClick = onBackClick,
                 modifier = Modifier.padding(innerPadding)
             )
+
+            else -> {
+                val university = uiState.university!!
+                val location = listOfNotNull(
+                    university.city?.takeIf { it.isNotBlank() },
+                    uiState.countryName?.takeIf { it.isNotBlank() }
+                ).joinToString(", ")
+                val facts = buildList {
+                    location.takeIf { it.isNotBlank() }?.let { add("Location" to it) }
+                }
+
+                DegreeWikiScreen(modifier = Modifier.padding(innerPadding)) {
+                    item {
+                        DetailHeroCard(
+                            title = university.name,
+                            subtitle = location.takeIf { it.isNotBlank() },
+                            supportingLines = listOfNotNull(
+                                university.overview?.takeIf { it.isNotBlank() }
+                            )
+                        )
+                    }
+                    item {
+                        DetailFactsCard(
+                            title = "Campus snapshot",
+                            subtitle = "We omit any missing fields instead of showing placeholders.",
+                            facts = facts
+                        )
+                    }
+                    university.overview?.takeIf { it.isNotBlank() }?.let { overview ->
+                        item {
+                            DetailTextSection(
+                                title = "Overview",
+                                body = overview
+                            )
+                        }
+                    }
+                    if (uiState.relatedPrograms.isNotEmpty()) {
+                        item {
+                            RelatedTextListCard(
+                                title = "Related programs",
+                                subtitle = "These cached programs currently point to this university.",
+                                items = uiState.relatedPrograms
+                            )
+                        }
+                    }
+                    item {
+                        DetailTrustNote(
+                            text = "University information may change. Check the official university website before applying."
+                        )
+                    }
+                    item {
+                        DetailFooterAction(
+                            text = "Back to universities",
+                            onClick = onBackClick
+                        )
+                    }
+                }
+            }
         }
     }
 }

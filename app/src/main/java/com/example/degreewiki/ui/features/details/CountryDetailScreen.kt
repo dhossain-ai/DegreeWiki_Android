@@ -1,18 +1,15 @@
 package com.example.degreewiki.ui.features.details
 
-import androidx.compose.foundation.layout.*
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material3.*
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.example.degreewiki.ui.components.DegreeWikiScreen
+import com.example.degreewiki.ui.components.LoadingState
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CountryDetailScreen(
     navKey: com.example.degreewiki.ui.navigation.CountryDetail,
@@ -25,78 +22,78 @@ fun CountryDetailScreen(
 
     Scaffold(
         topBar = {
-            TopAppBar(
-                title = { Text(uiState.country?.name ?: "Country Details") },
-                navigationIcon = {
-                    IconButton(onClick = onBackClick) {
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "Navigate back"
-                        )
-                    }
-                }
+            DetailTopAppBar(
+                title = uiState.country?.name ?: "Country details",
+                onBackClick = onBackClick
             )
         }
     ) { innerPadding ->
-        if (uiState.isLoading) {
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(innerPadding),
-                contentAlignment = Alignment.Center
-            ) {
-                CircularProgressIndicator()
-            }
-        } else if (uiState.country != null) {
-            val country = uiState.country!!
-            Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(innerPadding)
-                    .padding(16.dp),
-                verticalArrangement = Arrangement.spacedBy(16.dp)
-            ) {
-                ElevatedCard(
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    Column(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(16.dp),
-                        verticalArrangement = Arrangement.spacedBy(8.dp)
-                    ) {
-                        Text(
-                            text = country.name,
-                            style = MaterialTheme.typography.headlineMedium
-                        )
+        when {
+            uiState.isLoading -> LoadingState(
+                modifier = Modifier.padding(innerPadding),
+                label = "Loading country details"
+            )
 
-                        HorizontalDivider()
+            uiState.country == null -> DetailUnavailableState(
+                title = "Country unavailable",
+                message = "We could not load this destination right now. Go back and try opening it again.",
+                actionLabel = "Go back",
+                onActionClick = onBackClick,
+                modifier = Modifier.padding(innerPadding)
+            )
 
-                        country.summary?.let {
-                            Text(
-                                text = "Summary",
-                                style = MaterialTheme.typography.bodyMedium,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant
+            else -> {
+                val country = uiState.country!!
+
+                DegreeWikiScreen(modifier = Modifier.padding(innerPadding)) {
+                    item {
+                        DetailHeroCard(
+                            title = country.name,
+                            badge = "Destination",
+                            supportingLines = listOfNotNull(
+                                country.summary?.takeIf { it.isNotBlank() }
                             )
-                            Text(
-                                text = it,
-                                style = MaterialTheme.typography.bodyLarge
+                        )
+                    }
+                    country.summary?.takeIf { it.isNotBlank() }?.let { summary ->
+                        item {
+                            DetailTextSection(
+                                title = "Destination summary",
+                                body = summary
                             )
                         }
                     }
+                    if (uiState.relatedUniversities.isNotEmpty()) {
+                        item {
+                            RelatedTextListCard(
+                                title = "Universities in this destination",
+                                subtitle = "Shown only when current cached university records match this country.",
+                                items = uiState.relatedUniversities
+                            )
+                        }
+                    }
+                    if (uiState.relatedPrograms.isNotEmpty()) {
+                        item {
+                            RelatedTextListCard(
+                                title = "Programs connected to this destination",
+                                subtitle = "These are the cached program entries already tied to this country.",
+                                items = uiState.relatedPrograms
+                            )
+                        }
+                    }
+                    item {
+                        DetailTrustNote(
+                            text = "Study, visa, and cost information can change. Always confirm details on official sources."
+                        )
+                    }
+                    item {
+                        DetailFooterAction(
+                            text = "Back to countries",
+                            onClick = onBackClick
+                        )
+                    }
                 }
-
-                Text(
-                    text = "Details can change. Confirm final information on the official source before applying.",
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
             }
-        } else {
-            DetailUnavailableState(
-                message = "We could not load this destination right now.",
-                modifier = Modifier.padding(innerPadding)
-            )
         }
     }
 }

@@ -1,6 +1,5 @@
 package com.example.degreewiki.ui.features.details
 
-import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.degreewiki.data.repository.DataRepository

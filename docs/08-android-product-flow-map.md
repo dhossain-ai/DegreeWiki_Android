@@ -41,7 +41,7 @@ Current bottom navigation:
 - Home
 - Programs
 - Universities
-- Destinations
+- Countries
 - Profile
 
 Chat is not a bottom tab.
@@ -83,3 +83,19 @@ Do not invent:
 - deadlines
 - verification/source claims
 - AI or Fit Finder results
+
+## H. Detail Screen Behavior
+
+Current behavior:
+
+- Program detail uses the shared mobile shell and shows only title, university, country, degree level, subject, duration, and tuition when present.
+- University detail uses the shared shell, resolves country names from cached country records when possible, omits raw IDs, and may show related cached programs.
+- Country detail uses the shared shell, shows the cached summary, and may show related cached universities and programs when the current Android cache can derive them safely.
+- Missing fields are omitted rather than padded with placeholders or fake facts.
+- When detail data is unavailable, the screen shows a student-friendly unavailable state with a safe back action.
+
+Future richer API-backed behavior:
+
+- Program detail may later expand to languages, delivery mode, intake/deadline, requirements, and official links only when those fields exist in the Android contract.
+- University detail may later add official website and richer institution metadata once the Android model exposes them.
+- Country detail may later add richer destination guidance only after official, structured Android-backed fields exist for it.
