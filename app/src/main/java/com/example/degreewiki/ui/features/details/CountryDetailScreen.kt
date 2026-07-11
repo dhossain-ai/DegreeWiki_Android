@@ -63,6 +63,31 @@ fun CountryDetailScreen(
                             )
                         }
                     }
+                    item {
+                        DetailFactsCard("Destination facts", facts = buildList {
+                            uiState.detail?.iso2?.let { add("Country code" to it) }
+                            uiState.detail?.continent?.let { add("Continent" to it) }
+                            listOfNotNull(uiState.detail?.currencyName, uiState.detail?.currencyCode).distinct().joinToString(" · ").takeIf { it.isNotBlank() }?.let { add("Currency" to it) }
+                            uiState.detail?.capitalCityName?.let { add("Capital" to it) }
+                            uiState.detail?.officialLanguages?.takeIf { it.isNotEmpty() }?.let { add("Official languages" to it.joinToString()) }
+                        })
+                    }
+                    listOf(
+                        "Tuition overview" to uiState.detail?.tuitionOverview,
+                        "Living costs" to uiState.detail?.livingCostOverview,
+                        "Admissions" to uiState.detail?.admissionOverview,
+                        "Visa guidance" to uiState.detail?.visaOverview,
+                        "Student work rights" to uiState.detail?.studentWorkRightsOverview,
+                        "Post-study work" to uiState.detail?.postStudyWorkOverview,
+                        "University system" to uiState.detail?.universitySystemOverview,
+                        "Required documents" to uiState.detail?.requiredDocumentsOverview,
+                        "Intakes" to uiState.detail?.intakeOverview,
+                        "Official education information" to uiState.detail?.officialEducationUrl,
+                        "Official visa information" to uiState.detail?.officialVisaUrl
+                    ).forEach { (title, body) -> body?.takeIf { it.isNotBlank() }?.let { item { DetailTextSection(title, it) } } }
+                    uiState.detail?.faq?.filter { !it.question.isNullOrBlank() && !it.answer.isNullOrBlank() }?.takeIf { it.isNotEmpty() }?.let { faq ->
+                        item { RelatedTextListCard("Frequently asked questions", items = faq.map { "${it.question}\n${it.answer}" }) }
+                    }
                     if (uiState.relatedUniversities.isNotEmpty()) {
                         item {
                             RelatedTextListCard(

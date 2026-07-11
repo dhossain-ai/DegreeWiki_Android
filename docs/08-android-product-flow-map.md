@@ -103,3 +103,6 @@ The next safe product step is to keep the current flow shape but expand the mobi
 2. update Android DTOs/entities/mappers
 3. render only newly verified fields
 4. add scholarships/guides only after dedicated mobile-safe endpoints exist
+# Bundle 7 detail loading behavior
+
+Program, university, and country card taps still navigate by cached Room id. Each detail ViewModel observes the cached entity, uses its slug to request the matching public detail endpoint, and merges the in-memory result into the screen. Missing slug, HTTP failure, malformed/partial payload, or 404 leaves the cached record visible. If no cached record exists, the existing friendly unavailable state remains.

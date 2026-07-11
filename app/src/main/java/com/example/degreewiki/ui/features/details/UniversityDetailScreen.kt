@@ -50,6 +50,9 @@ fun UniversityDetailScreen(
                 ).joinToString(", ")
                 val facts = buildList {
                     location.takeIf { it.isNotBlank() }?.let { add("Location" to it) }
+                    uiState.detail?.institutionType?.takeIf { it.isNotBlank() }?.let { add("Institution type" to it) }
+                    uiState.detail?.foundedYear?.let { add("Founded" to it.toString()) }
+                    uiState.detail?.studentCount?.let { add("Students" to it.toString()) }
                 }
 
                 DegreeWikiScreen(modifier = Modifier.padding(innerPadding)) {
@@ -77,6 +80,18 @@ fun UniversityDetailScreen(
                             )
                         }
                     }
+                    listOf(
+                        "Ranking" to uiState.detail?.rankingSummary,
+                        "Admissions" to uiState.detail?.admissionOverview,
+                        "Applications" to uiState.detail?.applicationOverview,
+                        "Language requirements" to uiState.detail?.languageRequirementsSummary,
+                        "Scholarships" to uiState.detail?.scholarshipsSummary,
+                        "Housing" to uiState.detail?.housingSummary,
+                        "Student life" to uiState.detail?.studentLifeSummary,
+                        "International students" to uiState.detail?.internationalStudentSummary,
+                        "Career support" to uiState.detail?.careerSupportSummary,
+                        "Official website" to uiState.detail?.officialUrl
+                    ).forEach { (title, body) -> body?.takeIf { it.isNotBlank() }?.let { item { DetailTextSection(title, it) } } }
                     if (uiState.relatedPrograms.isNotEmpty()) {
                         item {
                             RelatedTextListCard(

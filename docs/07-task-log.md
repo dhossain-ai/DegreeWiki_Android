@@ -80,3 +80,17 @@
 - expand the public mobile contract for program, university, and destination detail fields
 - add Android DTO/cache/rendering support only after those fields are verified in the mobile API
 - plan dedicated scholarships and guides mobile endpoints separately from the current browse contract
+# 2026-07-11 — Bundle 7: consume rich public browse API
+
+Changed: expanded nullable list DTO contracts; added wrapped detail DTOs and Retrofit calls; added repository failure-safe detail fetches; wired all three detail ViewModels and screens to real rich fields; added parsing compatibility tests; updated API, status, flow, and audit docs.
+
+Created:
+
+- `app/src/main/java/com/example/degreewiki/data/network/dto/PublicDetailDtos.kt`
+- `app/src/test/java/com/example/degreewiki/data/network/PublicDtoParsingTest.kt`
+
+Modified: public DTOs, `DegreeWikiApiService`, `DataRepository`, three detail ViewModels, three detail screens, and Bundle 7 documentation. Deleted: none.
+
+Intentionally unchanged: web repo, Room schema/migration behavior, auth storage, network logging, dependencies, scholarships, guides, Fit Finder, and chat.
+
+Validation: `gradlew test`, `gradlew build`, and `gradlew lint` all passed. Manual QA: no emulator/device session was available; live list/detail API response shapes were inspected successfully. Known issue: list additions are not persisted, and official URLs are currently displayed as text rather than launched. Next: device QA and detail interaction polish.

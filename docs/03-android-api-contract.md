@@ -2,6 +2,18 @@
 
 Last audited: 2026-07-11
 
+## Bundle 7 rich public API update
+
+Android continues to parse the three collection endpoints as raw arrays. Their additive fields are nullable in `ProgramDto`, `UniversityDto`, and `CountryDto`, preserving compatibility with older/partial payloads.
+
+Android now calls these wrapped detail endpoints:
+
+- `GET /api/mobile/programs/{slug}` -> `{ ok, item: ProgramDetailDto? }`
+- `GET /api/mobile/universities/{slug}` -> `{ ok, item: UniversityDetailDto? }`
+- `GET /api/mobile/countries/{slug}` -> `{ ok, item: CountryDetailDto? }`
+
+The detail contracts were verified against the configured backend on 2026-07-11. They include nested identity/location records, public study/cost/admissions/support guidance, official URLs, related records, and explicit verification metadata. Additive properties are nullable; unknown fields are ignored. Detail responses are held in ViewModel state rather than persisted in Room.
+
 ## Rule
 
 This file records only contract surface verified from the Android repo and the checked web repo at `W:\DegreeWiki`. This audit made no web repo changes.

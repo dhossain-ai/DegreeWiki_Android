@@ -2,6 +2,10 @@
 
 Last audited: 2026-07-11
 
+## Bundle 7 resolution
+
+The previously documented rich-public-data gaps are now resolved at the network/detail UI layer for programs, universities, and countries. Collection endpoints remain raw arrays and accept expanded nullable fields. Dedicated slug detail endpoints are consumed with `{ ok, item }` wrappers. Rich details are not cached in Room; cached collection data is the offline/failure fallback. Scholarships and guides remain explicitly out of scope.
+
 ## Summary
 
 Bundle 5 confirmed that Android public browse is stable but intentionally thin. The app loads real Programs, Universities, and Countries from three mobile collection endpoints, caches them in Room, and renders details only from that cached collection data. The public web app already uses substantially richer program, university, destination, scholarship, and guide data that Android does not currently receive.

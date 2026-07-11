@@ -35,3 +35,13 @@ Last updated: 2026-07-11
 ## Next Recommended Bundle
 
 Bundle 6 should expand the public mobile contract in a structured way, starting with the highest-value missing detail fields for programs, universities, and destinations before any scholarships or guides implementation.
+# Bundle 7 status — complete (2026-07-11)
+
+- Android consumes the rich slug detail endpoints for programs, universities, and countries.
+- Program details show real location, language, modes, tuition display, intake/deadline, requirements, curriculum, career, URLs, and verification metadata when returned.
+- University details show real institution facts, ranking, admissions, language, scholarship, housing, student-life/international/career summaries, and official URL when returned.
+- Country details show real code/continent/currency/language facts, costs, admissions, visa/work/post-study guidance, official URLs, and FAQ when returned.
+- Cached list records render first and remain the fallback for missing slugs, 404s, malformed/partial responses, and network failures. Rich detail is in memory; Room schema and destructive migration behavior are unchanged.
+- Automated validation: unit tests, build, and lint (see task log). Manual device QA was not available in this environment.
+- Known issue: expanded list-only fields are parsed but not added to Room, so cards retain the existing cache-backed field set; rich additions appear on details.
+- Next recommended bundle: focused public-detail polish and device QA, including safe clickable official links and structured intake/related-record presentation.

@@ -13,18 +13,20 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
+import com.example.degreewiki.data.network.dto.CountryDetailDto
 
 data class CountryDetailUiState(
     val country: Country? = null,
     val relatedUniversities: List<String> = emptyList(),
     val relatedPrograms: List<String> = emptyList(),
     val isLoading: Boolean = true
+    ,val detail: CountryDetailDto? = null
 )
 
 @HiltViewModel(assistedFactory = CountryDetailViewModel.Factory::class)
 class CountryDetailViewModel @AssistedInject constructor(
     @Assisted private val navKey: CountryDetail,
-    dataRepository: DataRepository
+    private val dataRepository: DataRepository
 ) : ViewModel() {
 
     val uiState: StateFlow<CountryDetailUiState> = combine(
@@ -60,7 +62,8 @@ class CountryDetailViewModel @AssistedInject constructor(
             country = country,
             relatedUniversities = relatedUniversities,
             relatedPrograms = relatedPrograms,
-            isLoading = false
+            isLoading = false,
+            detail = country?.slug?.takeIf(String::isNotBlank)?.let { dataRepository.getCountryDetail(it) }
         )
     }
         .stateIn(

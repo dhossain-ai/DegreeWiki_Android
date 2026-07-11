@@ -54,6 +54,13 @@ fun ProgramDetailScreen(
                             "Tuition" to NumberFormat.getCurrencyInstance(Locale.US).format(it)
                         )
                     }
+                    uiState.detail?.location?.takeIf { it.isNotBlank() }?.let { add("Location" to it) }
+                    uiState.detail?.language?.takeIf { it.isNotBlank() }?.let { add("Language" to it) }
+                    uiState.detail?.studyModeLabel?.takeIf { it.isNotBlank() }?.let { add("Study mode" to it) }
+                    uiState.detail?.deliveryModeLabel?.takeIf { it.isNotBlank() }?.let { add("Delivery" to it) }
+                    uiState.detail?.tuition?.display?.takeIf { it.isNotBlank() }?.let { add("Tuition" to it) }
+                    uiState.detail?.nextIntake?.takeIf { it.isNotBlank() }?.let { add("Next intake" to it) }
+                    uiState.detail?.nextDeadline?.takeIf { it.isNotBlank() }?.let { add("Next deadline" to it) }
                 }
 
                 DegreeWikiScreen(modifier = Modifier.padding(innerPadding)) {
@@ -64,6 +71,21 @@ fun ProgramDetailScreen(
                             badge = program.degreeLevel,
                             supportingLines = listOf(program.countryName)
                         )
+                    }
+                    listOf(
+                        "Admission requirements" to uiState.detail?.admissionRequirements,
+                        "English requirements" to uiState.detail?.englishRequirements,
+                        "GPA requirements" to uiState.detail?.gpaRequirements,
+                        "Curriculum" to uiState.detail?.curriculumSummary,
+                        "Career outcomes" to uiState.detail?.careerOutcomes,
+                        "Official program page" to uiState.detail?.officialUrl,
+                        "Application page" to uiState.detail?.applicationUrl
+                    ).forEach { (title, body) -> body?.takeIf { it.isNotBlank() }?.let { item { DetailTextSection(title, it) } } }
+                    uiState.detail?.verificationStatus?.takeIf { it.isNotBlank() }?.let { status ->
+                        item { DetailFactsCard("Source status", facts = listOfNotNull(
+                            "Verification" to status.replace('_', ' '),
+                            uiState.detail?.lastVerifiedAt?.let { "Last verified" to it }
+                        )) }
                     }
                     item {
                         DetailFactsCard(

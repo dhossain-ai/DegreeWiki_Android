@@ -9,6 +9,9 @@ import com.example.degreewiki.data.network.DegreeWikiApiService
 import com.example.degreewiki.domain.model.Country
 import com.example.degreewiki.domain.model.Program
 import com.example.degreewiki.domain.model.University
+import com.example.degreewiki.data.network.dto.ProgramDetailDto
+import com.example.degreewiki.data.network.dto.UniversityDetailDto
+import com.example.degreewiki.data.network.dto.CountryDetailDto
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -34,6 +37,9 @@ interface DataRepository {
     fun getProgramById(id: String): Flow<Program?>
     fun getCountryById(id: String): Flow<Country?>
     fun getUniversityById(id: String): Flow<University?>
+    suspend fun getProgramDetail(slug: String): ProgramDetailDto?
+    suspend fun getUniversityDetail(slug: String): UniversityDetailDto?
+    suspend fun getCountryDetail(slug: String): CountryDetailDto?
     
     suspend fun refreshPrograms()
     suspend fun refreshCountries()
@@ -71,6 +77,14 @@ class DefaultDataRepository @Inject constructor(
     override fun getCountryById(id: String): Flow<Country?> = countryDao.getCountryById(id).map { it?.toDomain() }
 
     override fun getUniversityById(id: String): Flow<University?> = universityDao.getUniversityById(id).map { it?.toDomain() }
+
+    override suspend fun getProgramDetail(slug: String) = safeDetail { apiService.getProgramDetail(slug).takeIf { it.ok }?.item }
+    override suspend fun getUniversityDetail(slug: String) = safeDetail { apiService.getUniversityDetail(slug).takeIf { it.ok }?.item }
+    override suspend fun getCountryDetail(slug: String) = safeDetail { apiService.getCountryDetail(slug).takeIf { it.ok }?.item }
+
+    private suspend fun <T> safeDetail(block: suspend () -> T?): T? = withContext(Dispatchers.IO) {
+        try { block() } catch (_: Exception) { null }
+    }
 
     override suspend fun refreshPrograms() = withContext(Dispatchers.IO) {
         refreshInto(_programRefreshState) {

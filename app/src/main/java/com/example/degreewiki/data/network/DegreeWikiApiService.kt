@@ -3,6 +3,8 @@ package com.example.degreewiki.data.network
 import kotlinx.serialization.Serializable
 import retrofit2.http.GET
 import retrofit2.http.Query
+import retrofit2.http.Path
+import com.example.degreewiki.data.network.dto.*
 
 @Serializable
 data class BootstrapResponse(
@@ -51,6 +53,10 @@ interface DegreeWikiApiService {
 
     @GET("api/mobile/universities")
     suspend fun getUniversities(): List<com.example.degreewiki.data.network.dto.UniversityDto>
+
+    @GET("api/mobile/programs/{slug}") suspend fun getProgramDetail(@Path("slug") slug: String): DetailResponse<ProgramDetailDto>
+    @GET("api/mobile/universities/{slug}") suspend fun getUniversityDetail(@Path("slug") slug: String): DetailResponse<UniversityDetailDto>
+    @GET("api/mobile/countries/{slug}") suspend fun getCountryDetail(@Path("slug") slug: String): DetailResponse<CountryDetailDto>
 
     @GET("api/mobile/me")
     suspend fun getProfile(): com.example.degreewiki.data.network.dto.UserProfileDto
