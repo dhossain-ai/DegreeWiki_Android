@@ -1,6 +1,6 @@
 # Android Design System
 
-Last updated: 2026-07-12
+Last updated: 2026-07-12 (Bundle 9)
 
 The target Android experience is defined in `docs/10-android-mobile-ux-blueprint.md`. This document summarizes the reusable visual, content, and data-display rules that implementation bundles should follow.
 
@@ -103,13 +103,31 @@ Student copy should describe a benefit, action, or honest product state. Technic
 - `QuickBrowseCard`
 - `DeferredFeatureCard`
 - `SearchEntryCard`
+- `BrowseSectionHeader`
+- `HomeSearchCard`
+- `HorizontalContentSection`
+- `ProgramBrowseCard`
+- `UniversityBrowseCard`
+- `CountryBrowseCard`
+- `CompactFactRow`
+- `MetadataBadge`
+- `ImageOrInitials`
 
-These live in `app/src/main/java/com/example/degreewiki/ui/components/DegreeWikiComponents.kt`. Bundle 8 changes their design guidance only; it does not modify implementation.
+The original foundation lives in `DegreeWikiComponents.kt`; Bundle 9 browse components live in `BrowseComponents.kt`.
+
+## Bundle 9 Implementation Decisions
+
+- Home uses a compact three-line identity header, a single search entry that safely opens Programs, three primary browse cards, and conditional horizontal discovery sections.
+- Home discovery sections show at most three real records per type and disappear when no corresponding data exists.
+- Program cards constrain titles to two lines and render only available level, subject, tuition, and duration facts.
+- University overview teasers are limited to two lines and disappear when absent.
+- Country summaries are limited to three lines and disappear when absent.
+- Institution and destination cards use initials fallbacks. Remote images remain deferred because the project has no image-loading dependency.
+- `Countries` remains the compact bottom-navigation label; the screen heading is `Study destinations`.
 
 ## Current Gaps
 
-- Existing screens and components do not yet fully meet the blueprint’s hierarchy and copy standards.
-- List cards still need compact text treatment and stronger comparison facts.
+- Detail screens do not yet fully meet the blueprint’s hierarchy and action standards.
+- List cards can expose richer comparison metadata only after those fields are safely available in the list domain/cache contract.
 - Official links are not yet consistently actionable.
-- Bottom navigation uses `Countries` to avoid truncation; `Destinations` remains an open naming decision.
 - Typography still uses the system sans-serif family.

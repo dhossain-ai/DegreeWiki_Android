@@ -1,6 +1,6 @@
 # DegreeWiki Android Mobile UX Blueprint
 
-Last updated: 2026-07-12
+Last updated: 2026-07-12 (Bundle 9 implementation notes)
 
 ## 1. Purpose
 
@@ -417,9 +417,18 @@ All content must be real. An entry card must not imply a live destination before
 
 ## 18. Open Decisions
 
-- Should Android keep the `Countries` label or switch back to `Destinations` when the UI has space?
+- **Resolved for Bundle 9:** keep `Countries` in bottom navigation for narrow-screen usability and use `Study destinations` as the screen heading.
 - Should Home featured content use horizontal carousels or vertical cards?
 - Should Compare be public and local before login?
 - When, if ever, should Saved become a bottom tab?
 - Should Fit Finder require login immediately or allow an anonymous trial if the backend supports it?
 - Which mobile search filters should be supported first?
+
+## Bundle 9 Implementation Notes
+
+- Home featured content uses compact horizontal rows with at most three real records per section.
+- The Home search entry routes to Programs until real search behavior is implemented.
+- No Scholarships or Guides entry cards are rendered yet because they have no supported Android navigation.
+- Program, university, and country list cards use only the existing Room-backed domain fields.
+- Remote logos and destination images remain deferred; initials are used without adding an image-loading dependency.
+- Fit Finder appears only as a clearly deferred, non-clickable card.

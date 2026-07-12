@@ -2,6 +2,25 @@
 
 Last updated: 2026-07-12
 
+## Bundle 9 Status — Home + Public List Redesign
+
+- Status: completed and validated.
+- Home now uses student-first identity, search, browse, conditional discovery, deferred Fit Finder, and compact trust sections.
+- Programs, Universities, and Study destinations use reusable compact browse cards with constrained text and optional facts.
+- Search safely routes to Programs; advanced search is not implied or implemented.
+- Existing detail navigation, cached/offline presentation, refresh warnings, errors, and Profile/login flow are preserved.
+- No web, API, dependency, Room, repository, auth, network logging, Scholarships, Guides, Fit Finder, Chat, Saved Items, or Compare behavior changed.
+
+## Bundle 9 Validation
+
+- `gradlew.bat --stop`: passed
+- `gradlew.bat test`: passed
+- `gradlew.bat build`: passed
+- `gradlew.bat lint`: passed
+- `connectedDebugAndroidTest`: passed, 6 tests on the Pixel 8 API 17 emulator
+- Manual emulator QA: passed for Home, search routing, public lists, program detail navigation, back navigation, bottom navigation, and text constraints
+- Offline/error fallback code paths were preserved and automated refresh/state behavior remained unchanged; a live offline failure was not forced during manual QA
+
 ## Bundle 8 Status — Mobile UX Blueprint
 
 - Status: completed in documentation on 2026-07-12.
@@ -38,4 +57,4 @@ Last updated: 2026-07-12
 
 ## Next Recommended Bundle
 
-Bundle 9 — Home + Public List Redesign. Rewrite student-facing copy, strengthen the Home hierarchy, and compact program, university, and country cards using the existing data contract only.
+Bundle 10 — Detail Screen Redesign using the existing rich public detail APIs, with structured sections and safe clickable official links.

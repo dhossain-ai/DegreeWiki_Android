@@ -1,5 +1,75 @@
 # Android Task Log
 
+## 2026-07-12 — Bundle 9: Home + Public List Redesign
+
+- Rebuilt Home around a compact student-first identity header, safe Programs search entry, three browse routes, real conditional discovery rows, deferred Fit Finder, and a small independence note.
+- Replaced developer/internal copy across Home and the three public lists.
+- Added reusable program, university, and country browse cards with bounded text and optional metadata rendering.
+- Kept `Countries` in bottom navigation and adopted `Study destinations` as the screen heading.
+- Preserved Room-backed lists, ID-based detail navigation, refresh warnings, empty/error states, and Profile/login behavior.
+- Added Compose tests for Home search navigation and browse-card optional-field behavior.
+- Fixed obsolete explicit Compose assertion imports in two existing Android tests; no test dependency changed.
+
+### Files Created
+
+- `app/src/main/java/com/example/degreewiki/ui/components/BrowseComponents.kt`
+- `app/src/androidTest/java/com/example/degreewiki/ui/components/BrowseComponentsTest.kt`
+- `app/src/androidTest/java/com/example/degreewiki/ui/features/home/HomeContentTest.kt`
+
+### Files Modified
+
+- `app/src/main/java/com/example/degreewiki/ui/features/home/HomeScreen.kt`
+- `app/src/main/java/com/example/degreewiki/ui/features/main/MainScreen.kt`
+- `app/src/main/java/com/example/degreewiki/ui/features/discover/ProgramsScreen.kt`
+- `app/src/main/java/com/example/degreewiki/ui/features/discover/UniversitiesScreen.kt`
+- `app/src/main/java/com/example/degreewiki/ui/features/discover/CountriesScreen.kt`
+- `app/src/androidTest/java/com/example/degreewiki/ui/features/details/DetailUnavailableStateTest.kt`
+- `app/src/androidTest/java/com/example/degreewiki/ui/features/main/BottomNavigationBarTest.kt`
+- `docs/04-android-design-system.md`
+- `docs/06-status.md`
+- `docs/07-task-log.md`
+- `docs/08-android-product-flow-map.md`
+- `docs/10-android-mobile-ux-blueprint.md`
+
+### Intentionally Not Changed
+
+- web repo and public API endpoints
+- dependencies and Gradle configuration
+- Room schema, cache, repository, auth storage, and network logging
+- advanced search, filters, Scholarships, Guides, Fit Finder, Chat, Saved Items, and Compare
+- detail-screen implementation
+- fake or placeholder data
+
+### Validation Results
+
+- `gradlew.bat --stop`: passed
+- `gradlew.bat test`: passed
+- `gradlew.bat build`: passed
+- `gradlew.bat lint`: passed
+- `connectedDebugAndroidTest`: passed; 6 tests ran with no failures on the Pixel 8 API 17 emulator
+- Gradle emitted the existing SDK XML version compatibility warning during `test`; validation still succeeded
+
+### Manual QA
+
+- Home identity, search entry, browse cards, natural counts, horizontal featured content, and bottom navigation: passed on emulator.
+- Search entry safely opened Programs: passed.
+- Program cards were compact; optional facts were omitted; card tap opened rich detail; system back returned to Programs: passed.
+- University overview text and destination summaries were visibly constrained; missing overview content produced no technical fallback: passed.
+- Universities, Countries, and Profile bottom destinations remained reachable: passed for navigation labels and public lists; auth behavior was unchanged.
+- Static prohibited-copy scan across Home, discover screens, and shared components: passed.
+- Connected Compose tests covered Home navigation, bottom navigation, detail unavailable state, and optional card fields: passed.
+- A live offline failure was not forced; existing Room/repository and refresh-state code was not changed, and refresh warning/error rendering paths remain in place.
+
+### Remaining Issues
+
+- Remote logos and destination images are not rendered because no image-loading dependency exists; initials are used safely.
+- List models do not currently expose language, deadlines, public verification, university country names, rankings, or destination cost facts.
+- Horizontal discovery rows route to their corresponding browse screen rather than directly to detail.
+
+### Next Recommended Bundle
+
+- Bundle 10 — Detail Screen Redesign.
+
 ## 2026-07-12 — Bundle 8: Mobile UX Blueprint
 
 - Created a designer-level, mobile-native UX blueprint to guide Android implementation after technical stabilization.

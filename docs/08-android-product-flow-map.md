@@ -1,6 +1,6 @@
 # Android Product Flow Map
 
-Last updated: 2026-07-12
+Last updated: 2026-07-12 (Bundle 9)
 
 ## Purpose And Design Source
 
@@ -65,6 +65,18 @@ Home
 
 Featured Home content should appear only when real data is available. Unsupported chips, searches, filters, or entry cards must remain documented guidance rather than fake interactive controls.
 
+## Bundle 9 Implemented Discovery Flow
+
+- Home remains the first tab.
+- The Home search entry routes to Programs; it does not claim advanced or cross-entity search.
+- Programs, Universities, and Countries browse cards switch to their existing bottom-navigation destinations.
+- Featured programs, popular universities, and study destinations each show at most three real records in horizontal rows and route to the matching browse screen.
+- The Fit Finder card is visibly deferred and has no working action.
+- Scholarships, Guides, and Chat are not exposed as working destinations.
+- Program, university, and destination list cards preserve their existing ID-based detail navigation.
+- Offline content, refresh warnings, empty states, and retry behavior remain unchanged in flow.
+- Bottom navigation keeps `Countries`; the destination screen uses the more student-facing heading `Study destinations`.
+
 ## Detail Flow
 
 - Program detail targets a hero, action row, key facts, structured content, source/verification, and related programs.
@@ -104,7 +116,7 @@ Profile should explain student benefits before or alongside the supported email/
 
 ## Planned Bundle Sequence
 
-1. Bundle 9 — Home + Public List Redesign
+1. Bundle 9 — Home + Public List Redesign (implemented)
 2. Bundle 10 — Detail Screen Redesign
 3. Bundle 11 — Search + Filter UX
 4. Bundle 12 — Scholarships/Guides API in the web repo
