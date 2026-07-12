@@ -47,7 +47,6 @@ fun MainScreen(
                 onProgramsClick = { currentTab = DiscoveryTab.PROGRAMS },
                 onUniversitiesClick = { currentTab = DiscoveryTab.UNIVERSITIES },
                 onDestinationsClick = { currentTab = DiscoveryTab.COUNTRIES },
-                onProfileClick = { currentTab = DiscoveryTab.PROFILE },
                 modifier = Modifier.padding(innerPadding)
             )
             DiscoveryTab.PROGRAMS -> ProgramsScreen(

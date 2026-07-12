@@ -1,8 +1,6 @@
 package com.example.degreewiki.ui.features.home
 
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.MenuBook
 import androidx.compose.material.icons.filled.LocationOn
@@ -16,26 +14,24 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.example.degreewiki.ui.components.DegreeWikiCard
-import com.example.degreewiki.ui.components.DegreeWikiScreen
+import com.example.degreewiki.ui.components.CountryBrowseCard
 import com.example.degreewiki.ui.components.DeferredFeatureCard
-import com.example.degreewiki.ui.components.PrimaryActionButton
+import com.example.degreewiki.ui.components.DegreeWikiScreen
+import com.example.degreewiki.ui.components.ErrorState
+import com.example.degreewiki.ui.components.HomeSearchCard
+import com.example.degreewiki.ui.components.HorizontalContentSection
+import com.example.degreewiki.ui.components.ProgramBrowseCard
 import com.example.degreewiki.ui.components.QuickBrowseCard
 import com.example.degreewiki.ui.components.RefreshWarningNote
-import com.example.degreewiki.ui.components.ScreenHero
-import com.example.degreewiki.ui.components.SearchEntryCard
 import com.example.degreewiki.ui.components.SectionHeader
-import com.example.degreewiki.ui.components.StatusBadge
-import com.example.degreewiki.ui.components.StatusBadgeTone
 import com.example.degreewiki.ui.components.TrustNote
-import com.example.degreewiki.ui.components.ErrorState
+import com.example.degreewiki.ui.components.UniversityBrowseCard
 
 @Composable
 fun HomeScreen(
     onProgramsClick: () -> Unit,
     onUniversitiesClick: () -> Unit,
     onDestinationsClick: () -> Unit,
-    onProfileClick: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: HomeViewModel = hiltViewModel()
 ) {
@@ -43,8 +39,8 @@ fun HomeScreen(
 
     if (state.showFullError) {
         ErrorState(
-            title = "Study-abroad data unavailable",
-            message = "We could not load study-abroad data right now. Check your connection and try again.",
+            title = "Study-abroad information unavailable",
+            message = "We could not load study-abroad information right now. Check your connection and try again.",
             actionLabel = "Retry",
             onActionClick = viewModel::refresh,
             modifier = modifier
@@ -52,45 +48,71 @@ fun HomeScreen(
         return
     }
 
-    DegreeWikiScreen(modifier = modifier) {
+    HomeContent(
+        state = state,
+        onProgramsClick = onProgramsClick,
+        onUniversitiesClick = onUniversitiesClick,
+        onDestinationsClick = onDestinationsClick,
+        onRefresh = viewModel::refresh,
+        modifier = modifier
+    )
+}
+
+@Composable
+fun HomeContent(
+    state: HomeUiState,
+    onProgramsClick: () -> Unit,
+    onUniversitiesClick: () -> Unit,
+    onDestinationsClick: () -> Unit,
+    onRefresh: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    DegreeWikiScreen(
+        modifier = modifier,
+        verticalArrangement = Arrangement.spacedBy(14.dp)
+    ) {
         item {
-            ScreenHero(
-                title = "DegreeWiki",
-                subtitle = "Find and compare degrees abroad with a clearer, student-first starting point."
-            )
+            androidx.compose.foundation.layout.Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                Text(
+                    text = "DegreeWiki",
+                    style = MaterialTheme.typography.labelLarge,
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.primary
+                )
+                Text(
+                    text = "Find degrees abroad",
+                    style = MaterialTheme.typography.headlineMedium,
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.onBackground
+                )
+                Text(
+                    text = "Search programs, universities, and study destinations.",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            }
         }
-        item {
-            SearchEntryCard(
-                title = "Start with real browse data",
-                helper = "Open the existing Programs browse flow to search with the data already available in the app.",
-                onClick = onProgramsClick
-            )
-        }
-        item {
-            TrustNote(
-                text = "Source-aware study-abroad data. Always confirm final details on the official university or scholarship page before applying."
-            )
-        }
+        item { HomeSearchCard(onClick = onProgramsClick) }
         if (state.showRefreshWarning) {
             item {
                 RefreshWarningNote(
                     text = "Showing saved information. We could not refresh right now.",
                     actionLabel = "Retry",
-                    onActionClick = viewModel::refresh
+                    onActionClick = onRefresh
                 )
             }
         }
         item {
             SectionHeader(
-                title = "Quick browse",
-                subtitle = "Jump into the core public catalog."
+                title = "Explore your options",
+                subtitle = "Start with degrees, universities, or a study destination."
             )
         }
         item {
             QuickBrowseCard(
                 title = "Programs",
-                description = "Browse real program records already synced from the API.",
-                meta = "${state.programs.size} cached programs",
+                description = "Compare degrees by tuition, duration, and language.",
+                meta = naturalCount(state.programs.size, "program", "programs"),
                 icon = Icons.AutoMirrored.Filled.MenuBook,
                 onClick = onProgramsClick
             )
@@ -98,111 +120,79 @@ fun HomeScreen(
         item {
             QuickBrowseCard(
                 title = "Universities",
-                description = "Explore institutions and open their safe cached detail views.",
-                meta = "${state.universities.size} cached universities",
+                description = "Explore institutions and their programs.",
+                meta = naturalCount(state.universities.size, "university", "universities"),
                 icon = Icons.Default.School,
                 onClick = onUniversitiesClick
             )
         }
         item {
             QuickBrowseCard(
-                title = "Destinations",
-                description = "Browse available countries and destination summaries.",
-                meta = "${state.countries.size} cached destinations",
+                title = "Countries",
+                description = "Plan where to study abroad.",
+                meta = naturalCount(state.countries.size, "country", "countries"),
                 icon = Icons.Default.LocationOn,
                 onClick = onDestinationsClick
             )
         }
-        item {
-            SectionHeader(
-                title = "Featured now",
-                subtitle = "Only real API-backed content is shown here."
-            )
-        }
-        item {
-            HomeFeaturedCard(
-                title = state.programs.firstOrNull()?.title ?: "Programs update as soon as sync completes",
-                body = state.programs.firstOrNull()?.let {
-                    "${it.universityName} • ${it.countryName}"
-                } ?: "Open Programs to browse the currently available catalog.",
-                badge = if (state.programs.isNotEmpty()) "Real data" else "Waiting for data"
-            )
-        }
-        state.universities.firstOrNull()?.let { university ->
+        if (state.programs.isNotEmpty()) {
             item {
-                HomeFeaturedCard(
-                    title = university.name,
-                    body = listOfNotNull(university.city, university.overview).joinToString(" • ").ifBlank {
-                        "Available in the Universities catalog."
-                    },
-                    badge = "University"
-                )
+                HorizontalContentSection(
+                    title = "Featured programs",
+                    items = state.programs.take(3),
+                    key = { it.id }
+                ) { program, cardModifier ->
+                    ProgramBrowseCard(
+                        program = program,
+                        onClick = onProgramsClick,
+                        modifier = cardModifier
+                    )
+                }
             }
         }
-        item {
-            SectionHeader(
-                title = "Next tools",
-                subtitle = "Helpful surfaces we can add safely later."
-            )
-        }
-        item {
-            DegreeWikiCard {
-                Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                        Text(
-                            text = "Fit Finder",
-                            style = MaterialTheme.typography.titleMedium,
-                            color = MaterialTheme.colorScheme.onSurface
-                        )
-                        StatusBadge(label = "Soon", tone = StatusBadgeTone.Deadline)
-                    }
-                    Text(
-                        text = "Not sure where to start? Fit Finder will help match programs to your goals.",
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
+        if (state.universities.isNotEmpty()) {
+            item {
+                HorizontalContentSection(
+                    title = "Popular universities",
+                    items = state.universities.take(3),
+                    key = { it.id }
+                ) { university, cardModifier ->
+                    UniversityBrowseCard(
+                        university = university,
+                        onClick = onUniversitiesClick,
+                        modifier = cardModifier
                     )
-                    PrimaryActionButton(
-                        text = "Sign in to follow Fit Finder updates",
-                        onClick = onProfileClick
+                }
+            }
+        }
+        if (state.countries.isNotEmpty()) {
+            item {
+                HorizontalContentSection(
+                    title = "Study destinations",
+                    items = state.countries.take(3),
+                    key = { it.id }
+                ) { country, cardModifier ->
+                    CountryBrowseCard(
+                        country = country,
+                        onClick = onDestinationsClick,
+                        modifier = cardModifier
                     )
                 }
             }
         }
         item {
             DeferredFeatureCard(
-                title = "Ask a study-abroad question",
-                description = "A small help entry can live here later, but this Android shell does not present chat as a main working feature yet."
+                title = "Not sure where to start?",
+                description = "Fit Finder will help you explore programs based on your goals."
             )
         }
         item {
-            DeferredFeatureCard(
-                title = "Scholarships and guides",
-                description = "Future public content can be linked from Home once safe Android routes exist."
+            TrustNote(
+                text = "DegreeWiki is independent. Always confirm final details on official university or scholarship pages."
             )
         }
     }
 }
 
-@Composable
-private fun HomeFeaturedCard(
-    title: String,
-    body: String,
-    badge: String
-) {
-    DegreeWikiCard {
-        Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
-            StatusBadge(label = badge, tone = StatusBadgeTone.Neutral)
-            Text(
-                text = title,
-                style = MaterialTheme.typography.titleMedium,
-                fontWeight = FontWeight.SemiBold,
-                color = MaterialTheme.colorScheme.onSurface
-            )
-            Text(
-                text = body,
-                style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
-            )
-        }
-    }
-}
+private fun naturalCount(count: Int, singular: String, plural: String): String =
+    "$count ${if (count == 1) singular else plural}"
