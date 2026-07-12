@@ -17,8 +17,8 @@ import com.example.degreewiki.data.network.dto.CountryDetailDto
 
 data class CountryDetailUiState(
     val country: Country? = null,
-    val relatedUniversities: List<String> = emptyList(),
-    val relatedPrograms: List<String> = emptyList(),
+    val relatedUniversities: List<com.example.degreewiki.domain.model.University> = emptyList(),
+    val relatedPrograms: List<com.example.degreewiki.domain.model.Program> = emptyList(),
     val isLoading: Boolean = true
     ,val detail: CountryDetailDto? = null
 )
@@ -39,8 +39,7 @@ class CountryDetailViewModel @AssistedInject constructor(
                 universities
                     .asSequence()
                     .filter { it.countryId == countryId }
-                    .map { it.name }
-                    .distinct()
+                    .distinctBy { it.id }
                     .take(4)
                     .toList()
             }
@@ -51,8 +50,7 @@ class CountryDetailViewModel @AssistedInject constructor(
                 programs
                     .asSequence()
                     .filter { it.countryName.equals(countryName, ignoreCase = true) }
-                    .map { "${it.title} • ${it.universityName}" }
-                    .distinct()
+                    .distinctBy { it.id }
                     .take(4)
                     .toList()
             }

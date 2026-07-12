@@ -22,7 +22,7 @@ import com.example.degreewiki.data.network.dto.UniversityDetailDto
 data class UniversityDetailUiState(
     val university: University? = null,
     val countryName: String? = null,
-    val relatedPrograms: List<String> = emptyList(),
+    val relatedPrograms: List<com.example.degreewiki.domain.model.Program> = emptyList(),
     val isLoading: Boolean = true
     ,val detail: UniversityDetailDto? = null
 )
@@ -47,8 +47,7 @@ class UniversityDetailViewModel @AssistedInject constructor(
                 programs
                     .asSequence()
                     .filter { it.universityName.equals(universityName, ignoreCase = true) }
-                    .map { it.title }
-                    .distinct()
+                    .distinctBy { it.id }
                     .take(4)
                     .toList()
             }

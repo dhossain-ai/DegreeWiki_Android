@@ -1,10 +1,12 @@
 package com.example.degreewiki.ui.features.details
 
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.degreewiki.ui.components.DegreeWikiScreen
@@ -22,20 +24,9 @@ fun ProgramDetailScreen(
     )
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
-    Scaffold(
-        topBar = {
-            DetailTopAppBar(
-                title = uiState.program?.title ?: "Program details",
-                onBackClick = onBackClick
-            )
-        }
-    ) { innerPadding ->
+    Scaffold(topBar = { DetailTopBar(title = "Program details", onBackClick = onBackClick) }) { innerPadding ->
         when {
-            uiState.isLoading -> LoadingState(
-                modifier = Modifier.padding(innerPadding),
-                label = "Loading program details"
-            )
-
+            uiState.isLoading -> LoadingState(Modifier.padding(innerPadding), "Loading program details")
             uiState.program == null -> DetailUnavailableState(
                 title = "Program unavailable",
                 message = "We could not load this program right now. Go back and try opening it again.",
@@ -43,70 +34,77 @@ fun ProgramDetailScreen(
                 onActionClick = onBackClick,
                 modifier = Modifier.padding(innerPadding)
             )
+            else -> ProgramDetailContent(uiState = uiState, modifier = Modifier.padding(innerPadding))
+        }
+    }
+}
 
-            else -> {
-                val program = uiState.program!!
-                val facts = buildList {
-                    program.subject?.takeIf { it.isNotBlank() }?.let { add("Subject" to it) }
-                    program.duration?.takeIf { it.isNotBlank() }?.let { add("Duration" to it) }
-                    program.tuition?.let {
-                        add(
-                            "Tuition" to NumberFormat.getCurrencyInstance(Locale.US).format(it)
-                        )
-                    }
-                    uiState.detail?.location?.takeIf { it.isNotBlank() }?.let { add("Location" to it) }
-                    uiState.detail?.language?.takeIf { it.isNotBlank() }?.let { add("Language" to it) }
-                    uiState.detail?.studyModeLabel?.takeIf { it.isNotBlank() }?.let { add("Study mode" to it) }
-                    uiState.detail?.deliveryModeLabel?.takeIf { it.isNotBlank() }?.let { add("Delivery" to it) }
-                    uiState.detail?.tuition?.display?.takeIf { it.isNotBlank() }?.let { add("Tuition" to it) }
-                    uiState.detail?.nextIntake?.takeIf { it.isNotBlank() }?.let { add("Next intake" to it) }
-                    uiState.detail?.nextDeadline?.takeIf { it.isNotBlank() }?.let { add("Next deadline" to it) }
-                }
+@Composable
+internal fun ProgramDetailContent(uiState: ProgramDetailUiState, modifier: Modifier = Modifier) {
+    val program = uiState.program ?: return
+    val detail = uiState.detail
+    val location = detail?.location?.takeIf(String::isNotBlank) ?: program.countryName
+    val tuitionDisplay = detail?.tuition?.display?.takeIf(String::isNotBlank)
+        ?: program.tuition?.let { NumberFormat.getCurrencyInstance(Locale.US).format(it) }
+    val facts = listOfNotNull(
+        tuitionDisplay?.let { "Tuition" to it },
+        (detail?.duration ?: program.duration)?.takeIf(String::isNotBlank)?.let { "Duration" to it },
+        detail?.language?.takeIf(String::isNotBlank)?.let { "Language" to it },
+        detail?.studyModeLabel?.takeIf(String::isNotBlank)?.let { "Study mode" to it },
+        detail?.deliveryModeLabel?.takeIf(String::isNotBlank)?.let { "Delivery" to it },
+        program.degreeLevel.takeIf(String::isNotBlank)?.let { "Degree level" to it },
+        (detail?.subject?.name ?: program.subject)?.takeIf(String::isNotBlank)?.let { "Subject" to it },
+        location.takeIf(String::isNotBlank)?.let { "Location" to it }
+    )
+    val intakes = detail?.intakes.orEmpty().mapNotNull { intake ->
+        listOfNotNull(
+            intake.name?.takeIf(String::isNotBlank),
+            intake.intake?.takeIf(String::isNotBlank),
+            (intake.deadlineText ?: intake.deadline)?.takeIf(String::isNotBlank)?.let { "Deadline: $it" }
+        ).joinToString(" · ").takeIf(String::isNotBlank)
+    }.ifEmpty {
+        listOfNotNull(
+            detail?.nextIntake?.takeIf(String::isNotBlank)?.let { "Next intake: $it" },
+            detail?.nextDeadline?.takeIf(String::isNotBlank)?.let { "Next deadline: $it" }
+        )
+    }
 
-                DegreeWikiScreen(modifier = Modifier.padding(innerPadding)) {
-                    item {
-                        DetailHeroCard(
-                            title = program.title,
-                            subtitle = program.universityName,
-                            badge = program.degreeLevel,
-                            supportingLines = listOf(program.countryName)
-                        )
-                    }
-                    listOf(
-                        "Admission requirements" to uiState.detail?.admissionRequirements,
-                        "English requirements" to uiState.detail?.englishRequirements,
-                        "GPA requirements" to uiState.detail?.gpaRequirements,
-                        "Curriculum" to uiState.detail?.curriculumSummary,
-                        "Career outcomes" to uiState.detail?.careerOutcomes,
-                        "Official program page" to uiState.detail?.officialUrl,
-                        "Application page" to uiState.detail?.applicationUrl
-                    ).forEach { (title, body) -> body?.takeIf { it.isNotBlank() }?.let { item { DetailTextSection(title, it) } } }
-                    uiState.detail?.verificationStatus?.takeIf { it.isNotBlank() }?.let { status ->
-                        item { DetailFactsCard("Source status", facts = listOfNotNull(
-                            "Verification" to status.replace('_', ' '),
-                            uiState.detail?.lastVerifiedAt?.let { "Last verified" to it }
-                        )) }
-                    }
-                    item {
-                        DetailFactsCard(
-                            title = "Quick facts",
-                            subtitle = "Only fields already available in the current mobile record are shown.",
-                            facts = facts
-                        )
-                    }
-                    item {
-                        DetailTrustNote(
-                            text = "Details can change. Confirm final information on the official university page before applying."
-                        )
-                    }
-                    item {
-                        DetailFooterAction(
-                            text = "Back to programs",
-                            onClick = onBackClick
-                        )
-                    }
-                }
+    DegreeWikiScreen(modifier = modifier, verticalArrangement = Arrangement.spacedBy(16.dp)) {
+        item {
+            DetailHero(
+                title = program.title,
+                subtitle = program.universityName,
+                location = location,
+                badges = listOfNotNull(
+                    program.degreeLevel.takeIf(String::isNotBlank),
+                    detail?.language?.takeIf(String::isNotBlank),
+                    detail?.studyModeLabel?.takeIf(String::isNotBlank),
+                    detail?.deliveryModeLabel?.takeIf(String::isNotBlank)
+                )
+            )
+        }
+        item {
+            DetailActionRow(
+                actions = listOfNotNull(
+                    detail?.officialUrl?.let { "Official program page" to it },
+                    detail?.applicationUrl?.let { "Apply on university website" to it }
+                )
+            )
+        }
+        item { KeyFactsGrid(facts) }
+        if (intakes.isNotEmpty()) item { DetailTextSection("Intakes and deadlines", intakes.joinToString("\n")) }
+        detail?.tuition?.let { tuition ->
+            listOfNotNull(tuition.detail, tuition.notes).filter(String::isNotBlank).joinToString("\n\n").takeIf(String::isNotBlank)?.let { body ->
+                item { DetailTextSection("Tuition and fees", body) }
             }
         }
+        detail?.admissionRequirements?.takeIf(String::isNotBlank)?.let { item { DetailTextSection("Admission requirements", it) } }
+        detail?.englishRequirements?.takeIf(String::isNotBlank)?.let { item { DetailTextSection("English-language requirements", it) } }
+        detail?.gpaRequirements?.takeIf(String::isNotBlank)?.let { item { DetailTextSection("Academic and GPA requirements", it) } }
+        detail?.documents?.takeIf(String::isNotBlank)?.let { item { DetailTextSection("Required documents", it) } }
+        detail?.curriculumSummary?.takeIf(String::isNotBlank)?.let { item { ExpandableTextSection("Curriculum", it) } }
+        detail?.careerOutcomes?.takeIf(String::isNotBlank)?.let { item { ExpandableTextSection("Career outcomes", it) } }
+        detail?.university?.name?.takeIf(String::isNotBlank)?.let { item { DetailTextSection("University", it) } }
+        item { SourceStatusSection(detail?.verificationStatus, detail?.lastVerifiedAt) }
     }
 }

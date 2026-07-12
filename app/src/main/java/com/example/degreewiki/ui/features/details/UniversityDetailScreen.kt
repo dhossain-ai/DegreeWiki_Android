@@ -1,10 +1,13 @@
 package com.example.degreewiki.ui.features.details
 
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
-import androidx.compose.foundation.layout.padding
+import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.degreewiki.ui.components.DegreeWikiScreen
@@ -14,26 +17,16 @@ import com.example.degreewiki.ui.components.LoadingState
 fun UniversityDetailScreen(
     navKey: com.example.degreewiki.ui.navigation.UniversityDetail,
     onBackClick: () -> Unit,
+    onProgramClick: (String) -> Unit
 ) {
     val viewModel = hiltViewModel<UniversityDetailViewModel, UniversityDetailViewModel.Factory>(
         creationCallback = { factory -> factory.create(navKey) }
     )
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
-    Scaffold(
-        topBar = {
-            DetailTopAppBar(
-                title = uiState.university?.name ?: "University details",
-                onBackClick = onBackClick
-            )
-        }
-    ) { innerPadding ->
+    Scaffold(topBar = { DetailTopBar(title = "University", onBackClick = onBackClick) }) { innerPadding ->
         when {
-            uiState.isLoading -> LoadingState(
-                modifier = Modifier.padding(innerPadding),
-                label = "Loading university details"
-            )
-
+            uiState.isLoading -> LoadingState(Modifier.padding(innerPadding), "Loading university details")
             uiState.university == null -> DetailUnavailableState(
                 title = "University unavailable",
                 message = "We could not load this university right now. Go back and try opening it again.",
@@ -41,79 +34,75 @@ fun UniversityDetailScreen(
                 onActionClick = onBackClick,
                 modifier = Modifier.padding(innerPadding)
             )
+            else -> UniversityDetailContent(
+                uiState = uiState,
+                onProgramClick = onProgramClick,
+                modifier = Modifier.padding(innerPadding)
+            )
+        }
+    }
+}
 
-            else -> {
-                val university = uiState.university!!
-                val location = listOfNotNull(
-                    university.city?.takeIf { it.isNotBlank() },
-                    uiState.countryName?.takeIf { it.isNotBlank() }
-                ).joinToString(", ")
-                val facts = buildList {
-                    location.takeIf { it.isNotBlank() }?.let { add("Location" to it) }
-                    uiState.detail?.institutionType?.takeIf { it.isNotBlank() }?.let { add("Institution type" to it) }
-                    uiState.detail?.foundedYear?.let { add("Founded" to it.toString()) }
-                    uiState.detail?.studentCount?.let { add("Students" to it.toString()) }
-                }
+@Composable
+internal fun UniversityDetailContent(
+    uiState: UniversityDetailUiState,
+    onProgramClick: (String) -> Unit,
+    modifier: Modifier = Modifier
+) {
+    val university = uiState.university ?: return
+    val detail = uiState.detail
+    val location = listOfNotNull(
+        detail?.city?.name?.takeIf(String::isNotBlank) ?: university.city?.takeIf(String::isNotBlank),
+        detail?.country?.name?.takeIf(String::isNotBlank) ?: uiState.countryName?.takeIf(String::isNotBlank)
+    ).distinct().joinToString(", ")
+    val overview = detail?.overview?.takeIf(String::isNotBlank) ?: university.overview?.takeIf(String::isNotBlank)
+    val facts = listOfNotNull(
+        location.takeIf(String::isNotBlank)?.let { "Location" to it },
+        detail?.institutionType?.takeIf(String::isNotBlank)?.let { "Institution type" to it },
+        detail?.ownershipType?.takeIf(String::isNotBlank)?.let { "Ownership" to it },
+        detail?.foundedYear?.let { "Founded" to it.toString() },
+        detail?.studentCount?.let { "Students" to NumberFormatHelper.integer(it) },
+        uiState.relatedPrograms.takeIf(List<*>::isNotEmpty)?.let { "Programs" to it.size.toString() }
+    )
 
-                DegreeWikiScreen(modifier = Modifier.padding(innerPadding)) {
-                    item {
-                        DetailHeroCard(
-                            title = university.name,
-                            subtitle = location.takeIf { it.isNotBlank() },
-                            supportingLines = listOfNotNull(
-                                university.overview?.takeIf { it.isNotBlank() }
-                            )
-                        )
-                    }
-                    item {
-                        DetailFactsCard(
-                            title = "Campus snapshot",
-                            subtitle = "We omit any missing fields instead of showing placeholders.",
-                            facts = facts
-                        )
-                    }
-                    university.overview?.takeIf { it.isNotBlank() }?.let { overview ->
-                        item {
-                            DetailTextSection(
-                                title = "Overview",
-                                body = overview
-                            )
-                        }
-                    }
-                    listOf(
-                        "Ranking" to uiState.detail?.rankingSummary,
-                        "Admissions" to uiState.detail?.admissionOverview,
-                        "Applications" to uiState.detail?.applicationOverview,
-                        "Language requirements" to uiState.detail?.languageRequirementsSummary,
-                        "Scholarships" to uiState.detail?.scholarshipsSummary,
-                        "Housing" to uiState.detail?.housingSummary,
-                        "Student life" to uiState.detail?.studentLifeSummary,
-                        "International students" to uiState.detail?.internationalStudentSummary,
-                        "Career support" to uiState.detail?.careerSupportSummary,
-                        "Official website" to uiState.detail?.officialUrl
-                    ).forEach { (title, body) -> body?.takeIf { it.isNotBlank() }?.let { item { DetailTextSection(title, it) } } }
-                    if (uiState.relatedPrograms.isNotEmpty()) {
-                        item {
-                            RelatedTextListCard(
-                                title = "Related programs",
-                                subtitle = "These cached programs currently point to this university.",
-                                items = uiState.relatedPrograms
-                            )
-                        }
-                    }
-                    item {
-                        DetailTrustNote(
-                            text = "University information may change. Check the official university website before applying."
-                        )
-                    }
-                    item {
-                        DetailFooterAction(
-                            text = "Back to universities",
-                            onClick = onBackClick
+    DegreeWikiScreen(modifier = modifier, verticalArrangement = Arrangement.spacedBy(16.dp)) {
+        item {
+            DetailHero(
+                title = university.name,
+                location = location,
+                showInitials = true
+            )
+        }
+        detail?.officialUrl?.let { item { DetailActionRow(listOf("Visit university website" to it)) } }
+        item { KeyFactsGrid(facts) }
+        overview?.let { item { ExpandableTextSection("About", it) } }
+        detail?.rankingSummary?.takeIf(String::isNotBlank)?.let { item { DetailTextSection("Rankings", it) } }
+        detail?.admissionOverview?.takeIf(String::isNotBlank)?.let { item { DetailTextSection("Admissions", it) } }
+        detail?.applicationOverview?.takeIf(String::isNotBlank)?.let { item { DetailTextSection("Applications", it) } }
+        detail?.languageRequirementsSummary?.takeIf(String::isNotBlank)?.let { item { DetailTextSection("Language requirements", it) } }
+        detail?.scholarshipsSummary?.takeIf(String::isNotBlank)?.let { item { DetailTextSection("Scholarships", it) } }
+        detail?.housingSummary?.takeIf(String::isNotBlank)?.let { item { ExpandableTextSection("Housing", it) } }
+        detail?.internationalStudentSummary?.takeIf(String::isNotBlank)?.let { item { ExpandableTextSection("International student support", it) } }
+        detail?.studentLifeSummary?.takeIf(String::isNotBlank)?.let { item { ExpandableTextSection("Student life", it) } }
+        detail?.careerSupportSummary?.takeIf(String::isNotBlank)?.let { item { ExpandableTextSection("Career support", it) } }
+        if (uiState.relatedPrograms.isNotEmpty()) {
+            item {
+                DetailSection("Programs at this university") {
+                    uiState.relatedPrograms.forEachIndexed { index, program ->
+                        if (index > 0) HorizontalDivider()
+                        RelatedContentRow(
+                            title = program.title,
+                            subtitle = listOfNotNull(program.degreeLevel, program.duration).filter(String::isNotBlank).joinToString(" · "),
+                            onClick = { onProgramClick(program.id) }
                         )
                     }
                 }
             }
         }
+        item { SourceStatusSection(detail?.verificationStatus, detail?.lastVerifiedAt) }
     }
+}
+
+private object NumberFormatHelper {
+    fun integer(value: Int): String = java.text.NumberFormat.getIntegerInstance().format(value)
 }

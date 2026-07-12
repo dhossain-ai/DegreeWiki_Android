@@ -1,10 +1,14 @@
 package com.example.degreewiki.ui.features.details
 
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.degreewiki.ui.components.DegreeWikiScreen
@@ -14,111 +18,121 @@ import com.example.degreewiki.ui.components.LoadingState
 fun CountryDetailScreen(
     navKey: com.example.degreewiki.ui.navigation.CountryDetail,
     onBackClick: () -> Unit,
+    onProgramClick: (String) -> Unit,
+    onUniversityClick: (String) -> Unit
 ) {
     val viewModel = hiltViewModel<CountryDetailViewModel, CountryDetailViewModel.Factory>(
         creationCallback = { factory -> factory.create(navKey) }
     )
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
-    Scaffold(
-        topBar = {
-            DetailTopAppBar(
-                title = uiState.country?.name ?: "Country details",
-                onBackClick = onBackClick
-            )
-        }
-    ) { innerPadding ->
+    Scaffold(topBar = { DetailTopBar(title = "Study destination", onBackClick = onBackClick) }) { innerPadding ->
         when {
-            uiState.isLoading -> LoadingState(
-                modifier = Modifier.padding(innerPadding),
-                label = "Loading country details"
-            )
-
+            uiState.isLoading -> LoadingState(Modifier.padding(innerPadding), "Loading destination details")
             uiState.country == null -> DetailUnavailableState(
-                title = "Country unavailable",
+                title = "Destination unavailable",
                 message = "We could not load this destination right now. Go back and try opening it again.",
                 actionLabel = "Go back",
                 onActionClick = onBackClick,
                 modifier = Modifier.padding(innerPadding)
             )
+            else -> CountryDetailContent(
+                uiState = uiState,
+                onProgramClick = onProgramClick,
+                onUniversityClick = onUniversityClick,
+                modifier = Modifier.padding(innerPadding)
+            )
+        }
+    }
+}
 
-            else -> {
-                val country = uiState.country!!
+@Composable
+internal fun CountryDetailContent(
+    uiState: CountryDetailUiState,
+    onProgramClick: (String) -> Unit,
+    onUniversityClick: (String) -> Unit,
+    modifier: Modifier = Modifier
+) {
+    val country = uiState.country ?: return
+    val detail = uiState.detail
+    val overview = detail?.overview?.takeIf(String::isNotBlank) ?: country.summary?.takeIf(String::isNotBlank)
+    val heroSummary = detail?.destinationSummary
+        ?.takeIf(String::isNotBlank)
+        ?.takeUnless { summary -> overview?.trim()?.equals(summary.trim(), ignoreCase = true) == true }
+    val currency = listOfNotNull(detail?.currencyName, detail?.currencyCode).filter(String::isNotBlank).distinct().joinToString(" · ")
+    val facts = listOfNotNull(
+        detail?.iso2?.takeIf(String::isNotBlank)?.let { "Country code" to it },
+        detail?.continent?.takeIf(String::isNotBlank)?.let { "Continent" to it },
+        currency.takeIf(String::isNotBlank)?.let { "Currency" to it },
+        detail?.officialLanguages?.takeIf(List<*>::isNotEmpty)?.let { "Languages" to it.joinToString() }
+    )
 
-                DegreeWikiScreen(modifier = Modifier.padding(innerPadding)) {
-                    item {
-                        DetailHeroCard(
-                            title = country.name,
-                            badge = "Destination",
-                            supportingLines = listOfNotNull(
-                                country.summary?.takeIf { it.isNotBlank() }
-                            )
-                        )
-                    }
-                    country.summary?.takeIf { it.isNotBlank() }?.let { summary ->
-                        item {
-                            DetailTextSection(
-                                title = "Destination summary",
-                                body = summary
-                            )
-                        }
-                    }
-                    item {
-                        DetailFactsCard("Destination facts", facts = buildList {
-                            uiState.detail?.iso2?.let { add("Country code" to it) }
-                            uiState.detail?.continent?.let { add("Continent" to it) }
-                            listOfNotNull(uiState.detail?.currencyName, uiState.detail?.currencyCode).distinct().joinToString(" · ").takeIf { it.isNotBlank() }?.let { add("Currency" to it) }
-                            uiState.detail?.capitalCityName?.let { add("Capital" to it) }
-                            uiState.detail?.officialLanguages?.takeIf { it.isNotEmpty() }?.let { add("Official languages" to it.joinToString()) }
-                        })
-                    }
-                    listOf(
-                        "Tuition overview" to uiState.detail?.tuitionOverview,
-                        "Living costs" to uiState.detail?.livingCostOverview,
-                        "Admissions" to uiState.detail?.admissionOverview,
-                        "Visa guidance" to uiState.detail?.visaOverview,
-                        "Student work rights" to uiState.detail?.studentWorkRightsOverview,
-                        "Post-study work" to uiState.detail?.postStudyWorkOverview,
-                        "University system" to uiState.detail?.universitySystemOverview,
-                        "Required documents" to uiState.detail?.requiredDocumentsOverview,
-                        "Intakes" to uiState.detail?.intakeOverview,
-                        "Official education information" to uiState.detail?.officialEducationUrl,
-                        "Official visa information" to uiState.detail?.officialVisaUrl
-                    ).forEach { (title, body) -> body?.takeIf { it.isNotBlank() }?.let { item { DetailTextSection(title, it) } } }
-                    uiState.detail?.faq?.filter { !it.question.isNullOrBlank() && !it.answer.isNullOrBlank() }?.takeIf { it.isNotEmpty() }?.let { faq ->
-                        item { RelatedTextListCard("Frequently asked questions", items = faq.map { "${it.question}\n${it.answer}" }) }
-                    }
-                    if (uiState.relatedUniversities.isNotEmpty()) {
-                        item {
-                            RelatedTextListCard(
-                                title = "Universities in this destination",
-                                subtitle = "Shown only when current cached university records match this country.",
-                                items = uiState.relatedUniversities
-                            )
-                        }
-                    }
-                    if (uiState.relatedPrograms.isNotEmpty()) {
-                        item {
-                            RelatedTextListCard(
-                                title = "Programs connected to this destination",
-                                subtitle = "These are the cached program entries already tied to this country.",
-                                items = uiState.relatedPrograms
-                            )
-                        }
-                    }
-                    item {
-                        DetailTrustNote(
-                            text = "Study, visa, and cost information can change. Always confirm details on official sources."
-                        )
-                    }
-                    item {
-                        DetailFooterAction(
-                            text = "Back to countries",
-                            onClick = onBackClick
+    DegreeWikiScreen(modifier = modifier, verticalArrangement = Arrangement.spacedBy(16.dp)) {
+        item {
+            DetailHero(
+                title = country.name,
+                location = listOfNotNull(detail?.continent, currency.takeIf(String::isNotBlank)).filter(String::isNotBlank).joinToString(" · "),
+                showInitials = true,
+                summary = heroSummary
+            )
+        }
+        item { KeyFactsGrid(facts) }
+        detail?.tuitionOverview?.takeIf(String::isNotBlank)?.let { item { DetailTextSection("Tuition costs", it) } }
+        detail?.livingCostOverview?.takeIf(String::isNotBlank)?.let { item { DetailTextSection("Living costs", it) } }
+        detail?.admissionOverview?.takeIf(String::isNotBlank)?.let { item { DetailTextSection("Admissions and education system", it) } }
+        detail?.universitySystemOverview?.takeIf(String::isNotBlank)?.let { item { ExpandableTextSection("University system", it) } }
+        detail?.requiredDocumentsOverview?.takeIf(String::isNotBlank)?.let { item { DetailTextSection("Required documents", it) } }
+        detail?.intakeOverview?.takeIf(String::isNotBlank)?.let { item { DetailTextSection("Intakes", it) } }
+        detail?.visaOverview?.takeIf(String::isNotBlank)?.let { item { DetailTextSection("Visa guidance", it) } }
+        detail?.studentWorkRightsOverview?.takeIf(String::isNotBlank)?.let { item { DetailTextSection("Work while studying", it) } }
+        detail?.postStudyWorkOverview?.takeIf(String::isNotBlank)?.let { item { DetailTextSection("Post-study options", it) } }
+        detail?.scholarshipSummary?.takeIf(String::isNotBlank)?.let { item { DetailTextSection("Scholarships", it) } }
+        if (uiState.relatedUniversities.isNotEmpty()) {
+            item {
+                DetailSection("Universities in ${country.name}") {
+                    uiState.relatedUniversities.forEachIndexed { index, university ->
+                        if (index > 0) HorizontalDivider()
+                        RelatedContentRow(
+                            title = university.name,
+                            subtitle = university.city,
+                            onClick = { onUniversityClick(university.id) }
                         )
                     }
                 }
             }
         }
+        if (uiState.relatedPrograms.isNotEmpty()) {
+            item {
+                DetailSection("Programs in ${country.name}") {
+                    uiState.relatedPrograms.forEachIndexed { index, program ->
+                        if (index > 0) HorizontalDivider()
+                        RelatedContentRow(
+                            title = program.title,
+                            subtitle = listOf(program.universityName, program.degreeLevel).filter(String::isNotBlank).joinToString(" · "),
+                            onClick = { onProgramClick(program.id) }
+                        )
+                    }
+                }
+            }
+        }
+        overview?.let { item { ExpandableTextSection("About studying in ${country.name}", it) } }
+        detail?.faq?.filter { !it.question.isNullOrBlank() && !it.answer.isNullOrBlank() }?.takeIf(List<*>::isNotEmpty)?.let { faq ->
+            item {
+                DetailSection("Frequently asked questions") {
+                    Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                        faq.forEach { item -> FaqAccordionItem(item.question!!, item.answer!!) }
+                    }
+                }
+            }
+        }
+        item {
+            DetailActionRow(
+                actions = listOfNotNull(
+                    detail?.officialEducationUrl?.let { "Official education source" to it },
+                    detail?.officialVisaUrl?.let { "Official visa information" to it }
+                )
+            )
+        }
+        item { SourceStatusSection(detail?.verificationStatus, detail?.lastVerifiedAt) }
     }
 }

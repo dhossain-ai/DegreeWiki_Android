@@ -41,10 +41,8 @@ import androidx.core.net.toUri
 import com.example.degreewiki.ui.components.DegreeWikiCard
 import com.example.degreewiki.ui.components.EmptyState
 import com.example.degreewiki.ui.components.ImageOrInitials
-import com.example.degreewiki.ui.components.PrimaryActionButton
 import com.example.degreewiki.ui.components.StatusBadge
 import com.example.degreewiki.ui.components.StatusBadgeTone
-import com.example.degreewiki.ui.components.TrustNote
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -316,16 +314,3 @@ internal fun DetailUnavailableState(
 ) {
     EmptyState(title = title, message = message, modifier = modifier, actionLabel = actionLabel, onActionClick = onActionClick)
 }
-
-// Compatibility adapters retained only for the shared-component commit boundary.
-@Composable internal fun DetailTopAppBar(title: String, onBackClick: () -> Unit) = DetailTopBar(title, onBackClick)
-@Composable internal fun DetailHeroCard(title: String, subtitle: String? = null, badge: String? = null, supportingLines: List<String> = emptyList()) =
-    DetailHero(title = title, subtitle = subtitle, badges = listOfNotNull(badge), location = supportingLines.firstOrNull())
-@Composable internal fun DetailFactsCard(title: String, subtitle: String? = null, facts: List<Pair<String, String>>) {
-    if (facts.isNotEmpty()) DetailSection(title) { subtitle?.let { Text(it) }; facts.forEach { KeyFactItem(it.first, it.second) } }
-}
-@Composable internal fun RelatedTextListCard(title: String, subtitle: String? = null, items: List<String>) {
-    if (items.isNotEmpty()) DetailSection(title) { subtitle?.let { Text(it) }; items.forEach { RelatedContentRow(it) } }
-}
-@Composable internal fun DetailTrustNote(text: String) = TrustNote(text)
-@Composable internal fun DetailFooterAction(text: String, onClick: () -> Unit) = PrimaryActionButton(text, onClick)

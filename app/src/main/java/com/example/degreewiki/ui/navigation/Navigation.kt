@@ -41,13 +41,16 @@ fun MainNavigation() {
             entry<UniversityDetail> { key ->
                 com.example.degreewiki.ui.features.details.UniversityDetailScreen(
                     navKey = key,
-                    onBackClick = { backStack.removeLastOrNull() }
+                    onBackClick = { backStack.removeLastOrNull() },
+                    onProgramClick = { id -> backStack.add(ProgramDetail(id)) }
                 )
             }
             entry<CountryDetail> { key ->
                 com.example.degreewiki.ui.features.details.CountryDetailScreen(
                     navKey = key,
-                    onBackClick = { backStack.removeLastOrNull() }
+                    onBackClick = { backStack.removeLastOrNull() },
+                    onProgramClick = { id -> backStack.add(ProgramDetail(id)) },
+                    onUniversityClick = { id -> backStack.add(UniversityDetail(id)) }
                 )
             }
         }
