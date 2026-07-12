@@ -1,47 +1,41 @@
 # Android Status
 
-Last updated: 2026-07-11
+Last updated: 2026-07-12
 
-## Bundle 5 Status
+## Bundle 8 Status — Mobile UX Blueprint
 
-- Bundle 5 state: completed
-- Scope stayed documentation-only
-- No Android feature work was added
-- No web repo files were modified
+- Status: completed in documentation on 2026-07-12.
+- Created the designer-level mobile UX blueprint for the stable Android app.
+- Defined student-first copy, mobile navigation, Home, browse lists, details, Profile/login, Fit Finder, Chat, Scholarships, and Guides placement.
+- Aligned the Android design system and product flow map with the blueprint.
+- No Kotlin, Gradle, Android app, Room/cache/repository, auth, API, dependency, or web repo files were changed.
+- No UI, Scholarships/Guides, Fit Finder, or Chat behavior was implemented.
 
-## Current API/Data Contract Truth
+## Current Product And Data State
 
-- Android public browse currently uses only three thin collection endpoints:
-  - `/api/mobile/programs`
-  - `/api/mobile/universities`
-  - `/api/mobile/countries`
-- Android detail screens are cache lookups over Room, not separate mobile detail endpoints.
-- The public web app already uses much richer program, university, and destination data than Android currently receives.
-- Scholarships and guides exist as public web surfaces, but Android has no verified public mobile endpoints or screens for them yet.
+- Home-first shell and bottom navigation are available: Home, Programs, Universities, Countries, Profile.
+- Programs, universities, and countries load from public collection APIs into the existing Room-backed browse flow.
+- Detail screens render cached records first and enrich them with richer public detail API responses held in ViewModel memory.
+- Cached content remains visible if rich detail loading fails.
+- Login works through supported credentials; fake Google sign-in is not present.
+- Chat and Fit Finder are not exposed as fake working tabs.
+- Scholarships and Guides remain unimplemented on Android.
 
-## Most Important Missing Fields
+## Bundle 8 Validation
 
-- Programs: language, study mode, delivery mode, city, tuition currency/period, deadlines/intakes, official/application URLs, requirements, verification metadata
-- Universities: official URL, ranking/admissions/support summaries, short/native names, verification metadata
-- Destinations: ISO/currency/capital facts, tuition/living-cost guidance, visa/work guidance, official URLs, FAQ, verification metadata
+- `gradlew.bat test`: passed
+- `gradlew.bat build`: passed
+- `gradlew.bat lint`: passed
+- Final diff review confirmed that Bundle 8 changes are documentation-only.
 
-## Validation Results
+## Known Product Gaps
 
-- `./gradlew.bat test` passed
-- `./gradlew.bat build` passed
-- `./gradlew.bat lint` passed
-- `build` emitted one Android SDK XML version warning from the local toolchain, but the build still succeeded
+- Current screen copy and hierarchy still reflect developer-MVP patterns and have not yet been redesigned in code.
+- Browse cards need shorter text, better comparison facts, and stronger visual hierarchy.
+- Rich detail sections need clearer structure and actionable official links.
+- Search/filter, saved items, Scholarships/Guides, Fit Finder, and Chat remain future work.
+- The open UX decisions in `docs/10-android-mobile-ux-blueprint.md` require resolution during the relevant implementation bundles.
 
 ## Next Recommended Bundle
 
-Bundle 6 should expand the public mobile contract in a structured way, starting with the highest-value missing detail fields for programs, universities, and destinations before any scholarships or guides implementation.
-# Bundle 7 status — complete (2026-07-11)
-
-- Android consumes the rich slug detail endpoints for programs, universities, and countries.
-- Program details show real location, language, modes, tuition display, intake/deadline, requirements, curriculum, career, URLs, and verification metadata when returned.
-- University details show real institution facts, ranking, admissions, language, scholarship, housing, student-life/international/career summaries, and official URL when returned.
-- Country details show real code/continent/currency/language facts, costs, admissions, visa/work/post-study guidance, official URLs, and FAQ when returned.
-- Cached list records render first and remain the fallback for missing slugs, 404s, malformed/partial responses, and network failures. Rich detail is in memory; Room schema and destructive migration behavior are unchanged.
-- Automated validation: unit tests, build, and lint (see task log). Manual device QA was not available in this environment.
-- Known issue: expanded list-only fields are parsed but not added to Room, so cards retain the existing cache-backed field set; rich additions appear on details.
-- Next recommended bundle: focused public-detail polish and device QA, including safe clickable official links and structured intake/related-record presentation.
+Bundle 9 — Home + Public List Redesign. Rewrite student-facing copy, strengthen the Home hierarchy, and compact program, university, and country cards using the existing data contract only.

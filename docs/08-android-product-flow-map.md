@@ -1,48 +1,42 @@
 # Android Product Flow Map
 
-Last updated: 2026-07-11
+Last updated: 2026-07-12
 
-## A. Purpose
+## Purpose And Design Source
 
-This file maps the current DegreeWiki Android public flow after the Bundle 5 contract audit.
+This document maps DegreeWiki Android’s current and planned student flows. Bundle 8’s target screen hierarchy, language, and interaction rules are defined in `docs/10-android-mobile-ux-blueprint.md`; that blueprint is the design source for the implementation bundles that follow.
 
-## B. Public Access Without Login
+Desktop web may inform product logic and visual identity, but Android remains a mobile-native product and must not copy desktop layouts directly.
+
+## Public Access Without Login
 
 Public users can currently access:
 
 - Home
-- Programs list
-- Program detail
-- Universities list
-- University detail
-- Destinations list
-- Country detail
+- Programs list and program detail
+- Universities list and university detail
+- Countries list and country detail
+- Profile entry and login
 
-## C. Current Public Data Flow
+Public discovery must not be blocked by login. Missing data is omitted, and all displayed facts must be backed by API or cache data.
 
-Public browse is currently a collection-cache-detail loop, not a list-plus-detail-endpoint model.
+## Current Public Data Flow
 
-Flow:
+Public browse uses cache-backed collection screens plus richer in-memory detail responses:
 
-1. Screen ViewModel triggers `DataRepository.refreshPrograms()`, `refreshUniversities()`, or `refreshCountries()`.
-2. Repository calls one thin collection mobile endpoint:
-   - `/api/mobile/programs`
-   - `/api/mobile/universities`
-   - `/api/mobile/countries`
-3. DTOs are mapped directly into Room entities.
-4. Lists render from Room-backed flows.
-5. Detail screens load by cached `id` lookup only.
-6. University and country details derive a little extra context by joining other cached collections.
+1. A list ViewModel refreshes programs, universities, or countries from the corresponding mobile collection endpoint.
+2. Collection DTOs are mapped into Room and list screens observe Room-backed flows.
+3. A card tap navigates to detail by the cached record ID.
+4. The detail ViewModel renders the cached record first, resolves its slug, and requests the matching public detail endpoint.
+5. A successful detail response enriches the screen in ViewModel memory; rich detail fields are not persisted to Room.
+6. A missing slug, HTTP failure, malformed/partial response, or 404 leaves the cached record visible.
+7. If no cached record exists, the existing friendly unavailable state is shown.
 
-Implications:
+This fallback behavior keeps public detail navigation reliable without inventing content.
 
-- No Android public detail endpoint is currently called.
-- Rich web-only detail fields cannot appear on Android until the mobile API and Android DTO/cache contract expand.
-- Android correctly omits missing fields instead of fabricating them.
+## Near-Term Navigation
 
-## D. Bottom Navigation
-
-Current bottom navigation:
+Bottom navigation remains:
 
 - Home
 - Programs
@@ -50,59 +44,71 @@ Current bottom navigation:
 - Countries
 - Profile
 
-## E. Detail Screen Behavior
+Navigation rules:
 
-Current behavior:
+- Do not add Chat as a bottom tab.
+- Do not add Fit Finder as a bottom tab yet.
+- Introduce Scholarships and Guides through Home or Explore entry cards before considering any bottom-navigation change.
+- Reconsider future tabs only after search, saved items, and Fit Finder have mature flows.
 
-- Program detail shows only cached program fields: title, university, country, degree level, subject, duration, tuition.
-- University detail shows cached university fields plus resolved country name and related cached program titles.
-- Country detail shows cached summary plus related cached universities and programs.
-- Missing fields are omitted instead of replaced with fake placeholders.
-- Unavailable records show a safe fallback state with back navigation.
+## Target Discovery Flow
 
-## F. Web-To-Android Gap
+```text
+Home
+  -> Search card -> Programs list -> Program detail
+  -> Programs browse card -> Programs list
+  -> Universities browse card -> Universities list -> University detail
+  -> Countries browse card -> Countries list -> Country detail
+  -> Fit Finder CTA -> deferred until Bundle 15
+  -> Scholarships / Guides cards -> deferred until public API and Android screens exist
+```
 
-The public web app already shows richer information than Android can currently render.
+Featured Home content should appear only when real data is available. Unsupported chips, searches, filters, or entry cards must remain documented guidance rather than fake interactive controls.
 
-Not yet available in the Android public contract:
+## Detail Flow
 
-- program language, study mode, delivery mode, city, official links, deadlines, requirements, curriculum, career outcomes, verification metadata
-- university official links, ranking, admissions links, support/housing/scholarship/language/career sections, verification metadata
-- destination ISO/currency/capital facts, tuition and living-cost guidance, visa/work guidance, official URLs, FAQ, verification metadata
+- Program detail targets a hero, action row, key facts, structured content, source/verification, and related programs.
+- University detail targets a hero, official website action, overview, facts, admissions/support sections, programs, and source/verification.
+- Country detail targets a destination overview, quick facts, costs, visa/work guidance, education/admissions, related universities/programs, and official sources.
+- Each fact and section is conditional on real data.
+- Official links should become explicit actions in Bundle 10.
 
-## G. Deferred Public Surfaces
+## Login-Gated And Account Flows
 
-These still remain future Android work:
+Login is required only where account persistence or protected backend behavior requires it.
 
-- Scholarships
-- Guides and articles
-- Search/filter UX built on live public endpoints
-- Fit Finder
-- Chat
+- Public browsing and detail reading: no login.
+- Profile benefits and login entry: public.
+- Saving programs and cross-device saved items: login-gated when implemented.
+- Persistent Fit Finder results: login-gated when implemented.
+- Fit Finder entry may be visible publicly, but must not imply the flow works before Bundle 15.
+- Whether an anonymous Fit Finder trial is possible remains an open backend/product decision.
+- Compare may be public and local or account-backed; this remains an open decision.
 
-## H. Data Truth Rule
+Profile should explain student benefits before or alongside the supported email/password form. Do not expose fake Google login or any unsupported authentication method.
 
-Android must show only API-backed or cache-backed data.
+## Deferred Public Surfaces
 
-Do not invent:
+- Scholarships and Guides: Home/Explore entry points first; public list/detail screens after verified APIs exist.
+- Fit Finder: Home CTA and later profile/dashboard placement; backend-scored real programs only.
+- Chat: small contextual help placement only; not bottom navigation and not AI-first positioning.
+- Search/filter: Programs routing is acceptable near-term; real search inputs, chips, filters, and sorting belong to Bundle 11.
 
-- tuition
-- deadlines
-- verification labels
-- source-checked dates
-- visa guidance
-- scholarship availability
-- guide content
-- related content not backed by current cache
+## Data And Trust Rules
 
-## I. Next Flow Recommendation
+- Show only real API-backed or cache-backed data.
+- Omit missing facts and empty sections.
+- Never invent tuition, deadlines, verification, source dates, visa/work rules, scholarships, guide content, requirements, or related records.
+- Do not expose implementation terms such as cache, API sync, endpoint, or internal source signals to students.
+- Use a compact independence reminder and ask students to confirm final details on official university or scholarship pages.
 
-The next safe product step is to keep the current flow shape but expand the mobile contract deliberately:
+## Planned Bundle Sequence
 
-1. add structured public detail fields to the mobile API
-2. update Android DTOs/entities/mappers
-3. render only newly verified fields
-4. add scholarships/guides only after dedicated mobile-safe endpoints exist
-# Bundle 7 detail loading behavior
-
-Program, university, and country card taps still navigate by cached Room id. Each detail ViewModel observes the cached entity, uses its slug to request the matching public detail endpoint, and merges the in-memory result into the screen. Missing slug, HTTP failure, malformed/partial payload, or 404 leaves the cached record visible. If no cached record exists, the existing friendly unavailable state remains.
+1. Bundle 9 — Home + Public List Redesign
+2. Bundle 10 — Detail Screen Redesign
+3. Bundle 11 — Search + Filter UX
+4. Bundle 12 — Scholarships/Guides API in the web repo
+5. Bundle 13 — Scholarships/Guides Android
+6. Bundle 14 — Profile/Saved Items
+7. Bundle 15 — Fit Finder
+8. Bundle 16 — contextual Chat

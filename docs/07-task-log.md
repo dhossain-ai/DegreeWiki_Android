@@ -1,5 +1,55 @@
 # Android Task Log
 
+## 2026-07-12 — Bundle 8: Mobile UX Blueprint
+
+- Created a designer-level, mobile-native UX blueprint to guide Android implementation after technical stabilization.
+- Defined product principles, student-facing copy, near-term navigation, visual direction, and screen-by-screen blueprints for Home, public lists, public details, Profile/login, Fit Finder, Chat, Scholarships, and Guides.
+- Defined Bundles 9–16 as the recommended implementation sequence.
+- Updated the design system with copy rules, list-card text limits, conditional detail-section rules, and the requirement to omit missing data.
+- Updated the flow map to reflect the current cache-first plus in-memory rich-detail behavior and current public versus login-gated boundaries.
+
+### Files Created
+
+- `docs/10-android-mobile-ux-blueprint.md`
+
+### Files Modified
+
+- `docs/04-android-design-system.md`
+- `docs/06-status.md`
+- `docs/07-task-log.md`
+- `docs/08-android-product-flow-map.md`
+
+### Files Deleted
+
+- none
+
+### Intentionally Not Changed
+
+- no Kotlin or Android UI code
+- no Gradle files or dependencies
+- no web repo files
+- no API behavior
+- no Room, cache, repository, auth, or network logging behavior
+- no Scholarships, Guides, Fit Finder, or Chat implementation
+- no fake data
+
+### Validation Results
+
+- `gradlew.bat test`: passed
+- `gradlew.bat build`: passed
+- `gradlew.bat lint`: passed
+- Docs-only scope and changed-file list: passed final diff review
+- The sandbox initially blocked the Gradle distribution download; validation succeeded after the configured Gradle distribution was allowed to download.
+
+### Known Issues And Open Decisions
+
+- The current app UI still reflects the pre-blueprint developer-MVP design; this bundle intentionally changes documentation only.
+- Navigation naming, featured-content layout, Compare access, Saved navigation, Fit Finder login timing, and first search filters remain open decisions in the blueprint.
+
+### Next Recommended Bundle
+
+- Bundle 9 — Home + Public List Redesign using existing API/cache data only.
+
 ## 2026-07-11 - Bundle 5 Public Mobile API/Data Contract Audit
 
 - Scoped work to audit and documentation only.
