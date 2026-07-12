@@ -2,6 +2,25 @@
 
 Last updated: 2026-07-12
 
+## Bundle 10 Status — Public Detail Screen Redesign
+
+- Status: completed and validated.
+- Program, University, and Study destination details now use generic toolbars, concise heroes, key facts before narrative, conditional sections, safe external actions, and compact source status.
+- Long narrative content is expandable; FAQ answers are collapsed by default.
+- Related cached programs and universities navigate through their existing IDs when available.
+- Redundant bottom back actions, raw URL text, duplicate overviews, and student-visible developer copy were removed.
+- No web, API, dependency, Room, repository, auth, network logging, offline storage, Save, Compare, Scholarships/Guides flow, Fit Finder, or Chat behavior changed.
+
+## Bundle 10 Validation
+
+- `gradlew.bat --stop`: passed
+- `gradlew.bat test`: passed
+- `gradlew.bat build`: passed
+- `gradlew.bat lint`: passed
+- `gradlew.bat connectedDebugAndroidTest`: passed; 13 tests on the Pixel 8 API 17 emulator
+- Manual emulator QA: passed for program, university, and country hierarchy; expandable content; safe browser handoff; source status; related-content presentation; and back navigation
+- Cached/network fallback implementation was preserved; a live malformed or offline response was not forced during manual QA
+
 ## Bundle 9 Status — Home + Public List Redesign
 
 - Status: completed and validated.
@@ -57,4 +76,4 @@ Last updated: 2026-07-12
 
 ## Next Recommended Bundle
 
-Bundle 10 — Detail Screen Redesign using the existing rich public detail APIs, with structured sections and safe clickable official links.
+Bundle 11 — Search + Filter UX using supported public data and a mobile bottom-sheet filter model.

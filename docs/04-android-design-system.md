@@ -1,6 +1,6 @@
 # Android Design System
 
-Last updated: 2026-07-12 (Bundle 9)
+Last updated: 2026-07-12 (Bundle 10)
 
 The target Android experience is defined in `docs/10-android-mobile-ux-blueprint.md`. This document summarizes the reusable visual, content, and data-display rules that implementation bundles should follow.
 
@@ -79,6 +79,20 @@ Student copy should describe a benefit, action, or honest product state. Technic
 - Official URLs should become clear actions when implemented, not raw text or unverified claims.
 - Verification badges and source notes must reflect real public fields and use cautious wording.
 
+### Bundle 10 Detail Components
+
+- `DetailTopBar` uses a generic screen label so long entity names appear only in the hero.
+- `DetailHero` is the single strong elevated identity card and never contains a full overview article.
+- `DetailActionRow` and `ExternalLinkButton` expose only safe `http` or `https` URLs and never print raw URLs.
+- `KeyFactsGrid` uses compact two-column facts and omits missing values.
+- `DetailSection` uses a subtle border instead of giving every section heavy elevation.
+- `ExpandableTextSection` collapses long narrative copy to six lines with `Read more` and `Show less` controls.
+- `RelatedContentRow` uses real cached IDs for supported program and university detail navigation.
+- `SourceStatusSection` reserves green for explicit verified states; partial and unverified states use amber with cautious copy.
+- `FaqAccordionItem` is collapsed by default and reveals its answer on demand.
+
+Long narrative sections such as university/country About, curriculum, career outcomes, housing, student support, and student life may collapse. Decision facts, requirements, deadlines, costs, URLs, visa facts, and source status remain fully visible.
+
 ## Omit Missing Data
 
 - Omit an individual fact when its value is missing.
@@ -127,7 +141,7 @@ The original foundation lives in `DegreeWikiComponents.kt`; Bundle 9 browse comp
 
 ## Current Gaps
 
-- Detail screens do not yet fully meet the blueprint’s hierarchy and action standards.
+- Detail screens now meet the Bundle 10 hierarchy and action baseline; visual refinement may continue after device feedback.
 - List cards can expose richer comparison metadata only after those fields are safely available in the list domain/cache contract.
-- Official links are not yet consistently actionable.
+- Safe official program, application, university, education, and visa links are actionable on detail screens.
 - Typography still uses the system sans-serif family.

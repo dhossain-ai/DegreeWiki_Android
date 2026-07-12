@@ -1,6 +1,6 @@
 # DegreeWiki Android Mobile UX Blueprint
 
-Last updated: 2026-07-12 (Bundle 9 implementation notes)
+Last updated: 2026-07-12 (Bundle 10 implementation notes)
 
 ## 1. Purpose
 
@@ -432,3 +432,14 @@ All content must be real. An entry card must not imply a live destination before
 - Program, university, and country list cards use only the existing Room-backed domain fields.
 - Remote logos and destination images remain deferred; initials are used without adding an image-loading dependency.
 - Fit Finder appears only as a clearly deferred, non-clickable card.
+
+## Bundle 10 Implementation Notes
+
+- Detail toolbars use generic labels and bottom back buttons have been removed.
+- Program, university, and destination details put actions and structured facts before long narrative content.
+- Long university/country overviews, curriculum, career, housing, student-support, and student-life content use a six-line expandable treatment when sufficiently long.
+- Raw URLs are hidden behind external-link actions and only `http`/`https` targets are accepted.
+- Explicit verified states use green; partial or absent verification uses amber and asks students to confirm information on official sources.
+- Cached related programs and universities retain their real IDs and navigate to existing detail routes.
+- Country FAQs use collapsed accordion items.
+- No API, Room schema, dependency, auth, or offline-storage behavior changed.

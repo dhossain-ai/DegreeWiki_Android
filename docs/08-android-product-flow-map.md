@@ -1,6 +1,6 @@
 # Android Product Flow Map
 
-Last updated: 2026-07-12 (Bundle 9)
+Last updated: 2026-07-12 (Bundle 10)
 
 ## Purpose And Design Source
 
@@ -83,7 +83,18 @@ Featured Home content should appear only when real data is available. Unsupporte
 - University detail targets a hero, official website action, overview, facts, admissions/support sections, programs, and source/verification.
 - Country detail targets a destination overview, quick facts, costs, visa/work guidance, education/admissions, related universities/programs, and official sources.
 - Each fact and section is conditional on real data.
-- Official links should become explicit actions in Bundle 10.
+- Official links are explicit external actions only when their URL uses `http` or `https`.
+
+## Bundle 10 Implemented Detail Flow
+
+- Toolbars use `Program details`, `University`, and `Study destination`; entity names remain in the hero.
+- Program detail presents hero, official actions, key facts, decision sections, expandable curriculum/careers, and compact source status.
+- University detail presents hero, website action, facts, one expandable About section, conditional support sections, tappable related programs, and source status.
+- Country detail presents hero, facts, planning content before narrative, tappable related universities/programs, expandable About content, FAQ accordions, official-source actions, and source status.
+- Related records navigate only when the existing cached object provides a real ID.
+- System/back-arrow navigation replaces redundant bottom back buttons.
+- Missing or unsafe URLs produce no action; malformed opening attempts are failure-safe.
+- Cache-first fallback and rich in-memory detail loading remain unchanged.
 
 ## Login-Gated And Account Flows
 
@@ -117,7 +128,7 @@ Profile should explain student benefits before or alongside the supported email/
 ## Planned Bundle Sequence
 
 1. Bundle 9 — Home + Public List Redesign (implemented)
-2. Bundle 10 — Detail Screen Redesign
+2. Bundle 10 — Detail Screen Redesign (implemented)
 3. Bundle 11 — Search + Filter UX
 4. Bundle 12 — Scholarships/Guides API in the web repo
 5. Bundle 13 — Scholarships/Guides Android

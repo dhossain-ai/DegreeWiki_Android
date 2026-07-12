@@ -1,5 +1,69 @@
 # Android Task Log
 
+## 2026-07-12 — Bundle 10: Public Detail Screen Redesign
+
+- Rebuilt the shared detail component system around generic toolbars, concise heroes, safe external actions, compact facts, bordered sections, expandable narrative text, related-content rows, source status, and FAQ accordions.
+- Reordered Program detail around official/apply actions and decision facts before admission and narrative content.
+- Removed duplicate university overview content and made real cached related programs tappable.
+- Moved country planning content before the long destination narrative and added tappable related universities/programs plus FAQ accordions.
+- Removed raw URLs, bottom back buttons, and student-visible developer/cache copy.
+- Changed related-content ViewModel state from display strings to existing domain objects so real IDs remain available for navigation; persistence and repository behavior did not change.
+
+### Files Created
+
+- `app/src/androidTest/java/com/example/degreewiki/ui/features/details/DetailComponentsTest.kt`
+
+### Files Modified
+
+- `app/src/main/java/com/example/degreewiki/ui/features/details/DetailScreenComponents.kt`
+- `app/src/main/java/com/example/degreewiki/ui/features/details/ProgramDetailScreen.kt`
+- `app/src/main/java/com/example/degreewiki/ui/features/details/UniversityDetailScreen.kt`
+- `app/src/main/java/com/example/degreewiki/ui/features/details/CountryDetailScreen.kt`
+- `app/src/main/java/com/example/degreewiki/ui/features/details/UniversityDetailViewModel.kt`
+- `app/src/main/java/com/example/degreewiki/ui/features/details/CountryDetailViewModel.kt`
+- `app/src/main/java/com/example/degreewiki/ui/navigation/Navigation.kt`
+- `docs/04-android-design-system.md`
+- `docs/06-status.md`
+- `docs/07-task-log.md`
+- `docs/08-android-product-flow-map.md`
+- `docs/10-android-mobile-ux-blueprint.md`
+
+### Intentionally Not Changed
+
+- web repo, APIs, DTO contract, Room schema, repositories, auth storage, network logging, and dependencies
+- Save, Compare, Scholarships/Guides flows, Fit Finder, Chat, and image loading
+- list navigation, Home-first shell, Profile/login, and bottom navigation
+- fake or placeholder data
+
+### Validation Results
+
+- `gradlew.bat --stop`: passed
+- `gradlew.bat test`: passed
+- `gradlew.bat build`: passed
+- `gradlew.bat lint`: passed
+- `gradlew.bat connectedDebugAndroidTest`: passed; 13 tests ran with no failures on the Pixel 8 API 17 emulator
+- Gradle emitted the existing SDK XML version compatibility warning during `test`; validation still succeeded
+
+### Manual QA
+
+- Program: generic toolbar, concise hero, external actions, facts before content, raw-URL removal, expandable curriculum, cautious source status, and no bottom back button passed.
+- University: single About overview, text expansion, compact related-program rows, generic toolbar, and no developer copy passed.
+- Country: planning hierarchy, single non-duplicated About overview, expandable narrative, generic toolbar, and cautious source status passed. Manual review caught and fixed an identical hero/About summary duplication before final validation.
+- External-link handoff opened the emulator browser without crashing; unsafe/missing URL omission is covered by connected tests.
+- FAQ collapse/expand, missing-section omission, overview deduplication, related-program callback, and source-status wording passed connected Compose tests.
+- Back arrow and system back remained functional. No raw IDs, raw URLs, fake data, or bottom back actions were visible.
+- A live malformed-response/offline failure was not forced; the existing repository and cached fallback behavior was unchanged.
+
+### Remaining Issues
+
+- Related navigation is available only for records present in the existing cached collections with real IDs.
+- Remote hero/logo images remain out of scope because the app has no image-loading dependency.
+- External URI handling is failure-safe, but Android/browser availability controls the final handoff outside the app.
+
+### Next Recommended Bundle
+
+- Bundle 11 — Search + Filter UX.
+
 ## 2026-07-12 — Bundle 9: Home + Public List Redesign
 
 - Rebuilt Home around a compact student-first identity header, safe Programs search entry, three browse routes, real conditional discovery rows, deferred Fit Finder, and a small independence note.
