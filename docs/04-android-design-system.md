@@ -1,6 +1,23 @@
 # Android Design System
 
-Last updated: 2026-07-13 (Bundle 11)
+Last updated: 2026-07-14 (Bundle 13)
+
+## Bundle 13 Public Content Components
+
+- `ScholarshipBrowseCard` keeps title/provider first, summary to three lines, then only real
+  funding/deadline/scope and cautious verification cues.
+- `GuideBrowseCard` uses category, title, three-line summary, real publication/relationship data,
+  and the existing initials fallback; no image dependency was added.
+- Scholarship deadline presentation parses genuine ISO dates. Past dates use amber
+  `Deadline passed`; future dates use neutral `Deadline {date}`. Free-text/display values never
+  become invented open or availability states.
+- Scholarship details reuse the Bundle 10 hero, actions, facts, expandable narrative, related text,
+  and source components. Missing facts and unsupported schema sections are omitted.
+- `GuideContentRenderer` renders native headings, paragraphs, ordered/unordered lists, strong and
+  emphasized text, and safe HTTP(S) links. It is a vertically spaced article flow rather than one
+  oversized card and never executes HTML or Markdown.
+- Related Guide rows are compact and navigate by real slug. Green remains reserved for explicitly
+  verified records; partial/unverified states remain amber and cautious.
 
 The target Android experience is defined in `docs/10-android-mobile-ux-blueprint.md`. This document summarizes the reusable visual, content, and data-display rules that implementation bundles should follow.
 

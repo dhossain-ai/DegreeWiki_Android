@@ -1,6 +1,6 @@
 # Android Product Flow Map
 
-Last updated: 2026-07-13 (Bundle 11)
+Last updated: 2026-07-14 (Bundle 13)
 
 ## Purpose And Design Source
 
@@ -16,6 +16,8 @@ Public users can currently access:
 - Programs list and program detail
 - Universities list and university detail
 - Countries list and country detail
+- Scholarships list and scholarship detail, entered from Home
+- Study guides list and guide detail, entered from Home
 - Profile entry and login
 
 Public discovery must not be blocked by login. Missing data is omitted, and all displayed facts must be backed by API or cache data.
@@ -24,10 +26,10 @@ Public discovery must not be blocked by login. Missing data is omitted, and all 
 
 Public browse uses cache-backed collection screens plus richer in-memory detail responses:
 
-1. A list ViewModel refreshes programs, universities, or countries from the corresponding mobile collection endpoint.
+1. A list ViewModel refreshes programs, universities, countries, scholarships, or guides from the corresponding mobile collection endpoint.
 2. Collection DTOs are mapped into Room and list screens observe Room-backed flows.
-3. A card tap navigates to detail by the cached record ID.
-4. The detail ViewModel renders the cached record first, resolves its slug, and requests the matching public detail endpoint.
+3. Program/University/Country cards navigate by cached ID; Scholarship/Guide cards navigate by real slug.
+4. The detail ViewModel renders the cached record first and requests the matching public detail endpoint.
 5. A successful detail response enriches the screen in ViewModel memory; rich detail fields are not persisted to Room.
 6. A missing slug, HTTP failure, malformed/partial response, or 404 leaves the cached record visible.
 7. If no cached record exists, the existing friendly unavailable state is shown.
@@ -60,7 +62,8 @@ Home
   -> Universities browse card -> Universities list -> University detail
   -> Countries browse card -> Countries list -> Country detail
   -> Fit Finder CTA -> deferred until Bundle 15
-  -> Scholarships / Guides cards -> deferred until public API and Android screens exist
+  -> Scholarships card -> Scholarships list -> Scholarship detail
+  -> Guides card -> Study guides list -> Guide detail -> Related guide detail
 ```
 
 Featured Home content should appear only when real data is available. Unsupported chips, searches, filters, or entry cards must remain documented guidance rather than fake interactive controls.
@@ -72,7 +75,19 @@ Featured Home content should appear only when real data is available. Unsupporte
 - Programs, Universities, and Countries browse cards switch to their existing bottom-navigation destinations.
 - Featured programs, popular universities, and study destinations each show at most three real records in horizontal rows and route to the matching browse screen.
 - The Fit Finder card is visibly deferred and has no working action.
-- Scholarships, Guides, and Chat are not exposed as working destinations.
+- Scholarships and Guides are active Home destinations; Chat remains unavailable.
+
+## Bundle 13 Implemented Public Content Flow
+
+- Home has compact active Scholarship and Guide cards without adding a bottom tab or Explore tab.
+- Scholarship and Guide lists render Room first, refresh from raw-array endpoints, retain cached
+  content with a warning after refresh failure, and provide friendly loading/error/empty/retry states.
+- Detail routes use slugs and wrapped `{ ok, item }` endpoints. Rich detail stays in memory while a
+  cached summary remains as failure fallback.
+- Scholarship dates are parsed defensively and never imply open/available/closing-soon state.
+- Guide articles render documented JSON blocks as native Compose; unsafe links are non-clickable,
+  unknown blocks are skipped, and related guide slugs navigate normally.
+- Bottom navigation remains Home, Programs, Universities, Countries, Profile.
 - Program, university, and destination list cards preserve their existing ID-based detail navigation.
 - Offline content, refresh warnings, empty states, and retry behavior remain unchanged in flow.
 - Bottom navigation keeps `Countries`; the destination screen uses the more student-facing heading `Study destinations`.
