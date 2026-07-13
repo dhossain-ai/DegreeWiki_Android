@@ -58,6 +58,18 @@ interface DegreeWikiApiService {
     @GET("api/mobile/universities/{slug}") suspend fun getUniversityDetail(@Path("slug") slug: String): DetailResponse<UniversityDetailDto>
     @GET("api/mobile/countries/{slug}") suspend fun getCountryDetail(@Path("slug") slug: String): DetailResponse<CountryDetailDto>
 
+    @GET("api/mobile/scholarships")
+    suspend fun getScholarships(): List<ScholarshipDto>
+
+    @GET("api/mobile/scholarships/{slug}")
+    suspend fun getScholarshipDetail(@Path("slug") slug: String): DetailResponse<ScholarshipDetailDto>
+
+    @GET("api/mobile/guides")
+    suspend fun getGuides(): List<GuideDto>
+
+    @GET("api/mobile/guides/{slug}")
+    suspend fun getGuideDetail(@Path("slug") slug: String): DetailResponse<GuideDetailDto>
+
     @GET("api/mobile/me")
     suspend fun getProfile(): com.example.degreewiki.data.network.dto.UserProfileDto
 
