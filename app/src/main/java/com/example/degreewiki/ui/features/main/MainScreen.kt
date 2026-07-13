@@ -53,6 +53,8 @@ fun MainScreen(
                 },
                 onUniversitiesClick = { currentTab = DiscoveryTab.UNIVERSITIES },
                 onDestinationsClick = { currentTab = DiscoveryTab.COUNTRIES },
+                onScholarshipsClick = { onItemClick(com.example.degreewiki.ui.navigation.Scholarships) },
+                onGuidesClick = { onItemClick(com.example.degreewiki.ui.navigation.Guides) },
                 modifier = Modifier.padding(innerPadding)
             )
             DiscoveryTab.PROGRAMS -> ProgramsScreen(

@@ -17,3 +17,15 @@ data class UniversityDetail(val id: String) : NavKey
 
 @Serializable
 data class CountryDetail(val id: String) : NavKey
+
+@Serializable
+data object Scholarships : NavKey
+
+@Serializable
+data class ScholarshipDetail(val slug: String) : NavKey
+
+@Serializable
+data object Guides : NavKey
+
+@Serializable
+data class GuideDetail(val slug: String) : NavKey
