@@ -81,10 +81,12 @@ fun <T> HorizontalContentSection(
 
 @Composable
 fun HomeSearchCard(
-    onClick: () -> Unit,
+    query: String,
+    onQueryChange: (String) -> Unit,
+    onSearch: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    DegreeWikiCard(modifier = modifier, onClick = onClick) {
+    DegreeWikiCard(modifier = modifier) {
         Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
             Text(
                 text = "What do you want to study?",
@@ -92,36 +94,14 @@ fun HomeSearchCard(
                 fontWeight = FontWeight.SemiBold,
                 color = MaterialTheme.colorScheme.onSurface
             )
-            Surface(
-                modifier = Modifier.fillMaxWidth(),
-                shape = RoundedCornerShape(14.dp),
-                color = MaterialTheme.colorScheme.surfaceVariant
-            ) {
-                Row(
-                    modifier = Modifier.padding(horizontal = 14.dp, vertical = 13.dp),
-                    horizontalArrangement = Arrangement.spacedBy(10.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.Search,
-                        contentDescription = null,
-                        tint = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
-                    Text(
-                        text = "Search programs, subjects, or universities",
-                        modifier = Modifier.weight(1f),
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis,
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
-                    Text(
-                        text = "Search",
-                        style = MaterialTheme.typography.labelLarge,
-                        fontWeight = FontWeight.SemiBold,
-                        color = MaterialTheme.colorScheme.primary
-                    )
-                }
+            BrowseSearchBar(
+                query = query,
+                onQueryChange = onQueryChange,
+                placeholder = "Search programs, subjects, or universities",
+                onSearch = onSearch
+            )
+            androidx.compose.material3.Button(onClick = onSearch, modifier = Modifier.fillMaxWidth()) {
+                Text("Search")
             }
         }
     }

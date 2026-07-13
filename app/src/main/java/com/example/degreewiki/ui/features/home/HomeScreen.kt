@@ -9,6 +9,9 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -29,7 +32,7 @@ import com.example.degreewiki.ui.components.UniversityBrowseCard
 
 @Composable
 fun HomeScreen(
-    onProgramsClick: () -> Unit,
+    onProgramsClick: (String) -> Unit,
     onUniversitiesClick: () -> Unit,
     onDestinationsClick: () -> Unit,
     modifier: Modifier = Modifier,
@@ -61,12 +64,13 @@ fun HomeScreen(
 @Composable
 fun HomeContent(
     state: HomeUiState,
-    onProgramsClick: () -> Unit,
+    onProgramsClick: (String) -> Unit,
     onUniversitiesClick: () -> Unit,
     onDestinationsClick: () -> Unit,
     onRefresh: () -> Unit,
     modifier: Modifier = Modifier
 ) {
+    var searchQuery by rememberSaveable { mutableStateOf("") }
     DegreeWikiScreen(
         modifier = modifier,
         verticalArrangement = Arrangement.spacedBy(14.dp)
@@ -92,7 +96,13 @@ fun HomeContent(
                 )
             }
         }
-        item { HomeSearchCard(onClick = onProgramsClick) }
+        item {
+            HomeSearchCard(
+                query = searchQuery,
+                onQueryChange = { searchQuery = it },
+                onSearch = { onProgramsClick(searchQuery.trim()) }
+            )
+        }
         if (state.showRefreshWarning) {
             item {
                 RefreshWarningNote(
@@ -114,7 +124,7 @@ fun HomeContent(
                 description = "Compare degrees by tuition, duration, and language.",
                 meta = naturalCount(state.programs.size, "program", "programs"),
                 icon = Icons.AutoMirrored.Filled.MenuBook,
-                onClick = onProgramsClick
+                onClick = { onProgramsClick("") }
             )
         }
         item {
@@ -144,7 +154,7 @@ fun HomeContent(
                 ) { program, cardModifier ->
                     ProgramBrowseCard(
                         program = program,
-                        onClick = onProgramsClick,
+                        onClick = { onProgramsClick("") },
                         modifier = cardModifier
                     )
                 }

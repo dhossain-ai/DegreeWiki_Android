@@ -31,6 +31,8 @@ fun MainScreen(
     authViewModel: AuthViewModel = hiltViewModel()
 ) {
     var currentTab by rememberSaveable { mutableStateOf(DiscoveryTab.HOME) }
+    var nextProgramQueryRequestId by rememberSaveable { mutableStateOf(0L) }
+    var programQueryRequest by rememberSaveable { mutableStateOf<Pair<Long, String>?>(null) }
     val authState by authViewModel.authState.collectAsStateWithLifecycle()
 
     Scaffold(
@@ -44,13 +46,19 @@ fun MainScreen(
     ) { innerPadding ->
         when (currentTab) {
             DiscoveryTab.HOME -> HomeScreen(
-                onProgramsClick = { currentTab = DiscoveryTab.PROGRAMS },
+                onProgramsClick = { query ->
+                    nextProgramQueryRequestId += 1
+                    programQueryRequest = nextProgramQueryRequestId to query
+                    currentTab = DiscoveryTab.PROGRAMS
+                },
                 onUniversitiesClick = { currentTab = DiscoveryTab.UNIVERSITIES },
                 onDestinationsClick = { currentTab = DiscoveryTab.COUNTRIES },
                 modifier = Modifier.padding(innerPadding)
             )
             DiscoveryTab.PROGRAMS -> ProgramsScreen(
                 onItemClick = { id -> onItemClick(com.example.degreewiki.ui.navigation.ProgramDetail(id)) },
+                queryRequest = programQueryRequest,
+                onQueryRequestConsumed = { programQueryRequest = null },
                 modifier = Modifier.padding(innerPadding)
             )
             DiscoveryTab.UNIVERSITIES -> UniversitiesScreen(
