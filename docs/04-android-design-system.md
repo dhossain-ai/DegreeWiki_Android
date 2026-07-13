@@ -1,6 +1,6 @@
 # Android Design System
 
-Last updated: 2026-07-12 (Bundle 10)
+Last updated: 2026-07-13 (Bundle 11)
 
 The target Android experience is defined in `docs/10-android-mobile-ux-blueprint.md`. This document summarizes the reusable visual, content, and data-display rules that implementation bundles should follow.
 
@@ -126,6 +126,12 @@ Long narrative sections such as university/country About, curriculum, career out
 - `CompactFactRow`
 - `MetadataBadge`
 - `ImageOrInitials`
+- `BrowseSearchBar`
+- `BrowseFilterButton`
+- `BrowseSortButton`
+- `ActiveFilterChips`
+- `BrowseResultsHeader`
+- `SearchEmptyState`
 
 The original foundation lives in `DegreeWikiComponents.kt`; Bundle 9 browse components live in `BrowseComponents.kt`.
 
@@ -138,6 +144,16 @@ The original foundation lives in `DegreeWikiComponents.kt`; Bundle 9 browse comp
 - Country summaries are limited to three lines and disappear when absent.
 - Institution and destination cards use initials fallbacks. Remote images remain deferred because the project has no image-loading dependency.
 - `Countries` remains the compact bottom-navigation label; the screen heading is `Study destinations`.
+
+## Bundle 11 Search And Filter Rules
+
+- Program search covers only title, university, country, subject, and degree level from the Room-backed list model.
+- Program filter values are derived from loaded records; supported dimensions are degree level, country, subject, and university when its option list is not too noisy.
+- Active filters use horizontally scrolling removable chips and expose `Clear all` for multiple selections.
+- Program sorting is limited to original order, title A–Z, title Z–A, and university A–Z.
+- University search covers name, city, and overview teaser. Country search covers name and summary.
+- Zero-result search uses a helpful discovery empty state rather than a network or technical error.
+- Language, study mode, delivery, deadline, verification, and tuition-range controls remain deferred because those fields are not consistently persisted in list models.
 
 ## Current Gaps
 

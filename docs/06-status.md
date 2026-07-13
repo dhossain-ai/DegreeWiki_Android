@@ -1,6 +1,25 @@
 # Android Status
 
-Last updated: 2026-07-12
+Last updated: 2026-07-13
+
+## Bundle 11 Status — Search + Filter UX
+
+- Status: completed and validated.
+- Home accepts a real program query and routes to Programs with it applied.
+- Programs supports offline local search, derived multi-select filters, removable active chips, clear actions, reliable text sorting, result counts, and discovery-specific empty states.
+- Universities and Study destinations have compact local search using only their current list fields.
+- Search/filter state is ViewModel-owned and remains active while opening a detail and returning in the current app session.
+- No web, backend endpoint, dependency, Room schema, repository, auth, network logging, Saved, Compare, Scholarships/Guides, Fit Finder, or Chat behavior changed.
+
+## Bundle 11 Validation
+
+- `gradlew.bat --stop`: passed
+- `gradlew.bat test`: passed
+- `gradlew.bat build`: passed
+- `gradlew.bat lint`: passed
+- `gradlew.bat connectedDebugAndroidTest`: passed; 15 tests on the Pixel 8 API 17 emulator
+- Manual emulator QA: passed for Home query transfer, Programs search/filter/chips/sort/state return, University search, destination search, and helpful zero-result state
+- Search operated over already loaded Room-backed records without a search-network request; a live offline transition was not forced
 
 ## Bundle 10 Status — Public Detail Screen Redesign
 
@@ -76,4 +95,4 @@ Last updated: 2026-07-12
 
 ## Next Recommended Bundle
 
-Bundle 11 — Search + Filter UX using supported public data and a mobile bottom-sheet filter model.
+Bundle 12 — Scholarships/Guides public API work in the web repo, scoped separately from Android.

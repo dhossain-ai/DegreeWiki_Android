@@ -1,6 +1,6 @@
 # Android Product Flow Map
 
-Last updated: 2026-07-12 (Bundle 10)
+Last updated: 2026-07-13 (Bundle 11)
 
 ## Purpose And Design Source
 
@@ -96,6 +96,16 @@ Featured Home content should appear only when real data is available. Unsupporte
 - Missing or unsafe URLs produce no action; malformed opening attempts are failure-safe.
 - Cache-first fallback and rich in-memory detail loading remain unchanged.
 
+## Bundle 11 Implemented Search Flow
+
+- Home accepts a real program query and sends it once to Programs; blank submission safely opens Programs.
+- Programs searches the already loaded Room-backed collection locally and never calls a search endpoint.
+- Query, active filters, and sort live in the Programs ViewModel, so detail navigation and recomposition preserve discovery state.
+- Program filters support degree level, country, subject, and a bounded university section using values derived from real records.
+- Filter-sheet edits remain drafts until Apply; dismissing the sheet does not change active filters.
+- Universities search locally by name, city, and overview. Study destinations search locally by country name and summary.
+- Search results retain existing detail navigation, refresh warnings, offline visibility, and error behavior.
+
 ## Login-Gated And Account Flows
 
 Login is required only where account persistence or protected backend behavior requires it.
@@ -115,7 +125,7 @@ Profile should explain student benefits before or alongside the supported email/
 - Scholarships and Guides: Home/Explore entry points first; public list/detail screens after verified APIs exist.
 - Fit Finder: Home CTA and later profile/dashboard placement; backend-scored real programs only.
 - Chat: small contextual help placement only; not bottom navigation and not AI-first positioning.
-- Search/filter: Programs routing is acceptable near-term; real search inputs, chips, filters, and sorting belong to Bundle 11.
+- Search/filter: local browse search, program filters, chips, and sorting are implemented; remote autocomplete remains deferred.
 
 ## Data And Trust Rules
 
@@ -129,7 +139,7 @@ Profile should explain student benefits before or alongside the supported email/
 
 1. Bundle 9 — Home + Public List Redesign (implemented)
 2. Bundle 10 — Detail Screen Redesign (implemented)
-3. Bundle 11 — Search + Filter UX
+3. Bundle 11 — Search + Filter UX (implemented)
 4. Bundle 12 — Scholarships/Guides API in the web repo
 5. Bundle 13 — Scholarships/Guides Android
 6. Bundle 14 — Profile/Saved Items

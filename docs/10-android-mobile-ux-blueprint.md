@@ -1,6 +1,6 @@
 # DegreeWiki Android Mobile UX Blueprint
 
-Last updated: 2026-07-12 (Bundle 10 implementation notes)
+Last updated: 2026-07-13 (Bundle 11 implementation notes)
 
 ## 1. Purpose
 
@@ -443,3 +443,13 @@ All content must be real. An entry card must not imply a live destination before
 - Cached related programs and universities retain their real IDs and navigate to existing detail routes.
 - Country FAQs use collapsed accordion items.
 - No API, Room schema, dependency, auth, or offline-storage behavior changed.
+
+## Bundle 11 Implementation Notes
+
+- Home search is a real controlled query entry whose button and keyboard action route to Programs with the query applied.
+- Programs performs case-insensitive, whitespace-normalized partial-word matching across title, university, country, subject, and degree level.
+- Supported program filters are degree level, country, subject, and university when the derived list remains compact.
+- Supported sorting is original order, title A–Z, title Z–A, and university A–Z; no relevance or tuition sorting is invented.
+- University search uses name, city, and overview; destination search uses country name and summary.
+- Search/filter/sort state remains in screen ViewModels and survives detail navigation within the current app session.
+- Language, study mode, delivery mode, deadlines, verification, tuition range, remote autocomplete, and cross-content search remain deferred.

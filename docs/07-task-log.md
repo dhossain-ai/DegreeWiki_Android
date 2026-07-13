@@ -1,5 +1,75 @@
 # Android Task Log
 
+## 2026-07-13 — Bundle 11: Search + Filter UX
+
+- Added pure local matching, derived filter options, multi-filter combination, and reliable program sorting.
+- Upgraded Home search to accept text, clear it, submit from the keyboard or button, and open Programs with the query applied once.
+- Added compact search bars, filter-count action, draft/apply filter sheet, active removable chips, sort sheet, natural result counts, and helpful zero-result states.
+- Added simple local University and Study destination search using only current list/domain fields.
+- Kept search/filter/sort state in ViewModels so it survives detail navigation and tab recomposition within the session.
+- Did not call or implement `/api/mobile/programs/search`.
+
+### Files Created
+
+- `app/src/main/java/com/example/degreewiki/ui/features/discover/BrowseSearch.kt`
+- `app/src/main/java/com/example/degreewiki/ui/features/discover/ProgramFilterSheets.kt`
+- `app/src/main/java/com/example/degreewiki/ui/components/SearchComponents.kt`
+- `app/src/test/java/com/example/degreewiki/ui/features/discover/BrowseSearchTest.kt`
+- `app/src/androidTest/java/com/example/degreewiki/ui/components/SearchComponentsTest.kt`
+
+### Files Modified
+
+- `app/src/main/java/com/example/degreewiki/ui/components/BrowseComponents.kt`
+- `app/src/main/java/com/example/degreewiki/ui/features/home/HomeScreen.kt`
+- `app/src/main/java/com/example/degreewiki/ui/features/main/MainScreen.kt`
+- `app/src/main/java/com/example/degreewiki/ui/features/discover/ProgramsScreen.kt`
+- `app/src/main/java/com/example/degreewiki/ui/features/discover/ProgramsViewModel.kt`
+- `app/src/main/java/com/example/degreewiki/ui/features/discover/UniversitiesScreen.kt`
+- `app/src/main/java/com/example/degreewiki/ui/features/discover/UniversitiesViewModel.kt`
+- `app/src/main/java/com/example/degreewiki/ui/features/discover/CountriesScreen.kt`
+- `app/src/main/java/com/example/degreewiki/ui/features/discover/CountriesViewModel.kt`
+- `app/src/androidTest/java/com/example/degreewiki/ui/features/home/HomeContentTest.kt`
+- `docs/03-android-api-contract.md`
+- `docs/04-android-design-system.md`
+- `docs/06-status.md`
+- `docs/07-task-log.md`
+- `docs/08-android-product-flow-map.md`
+- `docs/10-android-mobile-ux-blueprint.md`
+
+### Intentionally Not Changed
+
+- web repo, backend routes, DTO/API payloads, Room schema, repositories, auth storage, network logging, and dependencies
+- detail-screen design, Saved, Compare, Scholarships/Guides, Fit Finder, Chat, remote autocomplete, and fake suggestions
+- unsupported list filters for language, study mode, delivery, deadline, verification, and tuition range
+
+### Validation Results
+
+- `gradlew.bat --stop`: passed
+- `gradlew.bat test`: passed
+- `gradlew.bat build`: passed
+- `gradlew.bat lint`: passed
+- `gradlew.bat connectedDebugAndroidTest`: passed; 15 tests ran with no failures on the Pixel 8 API 17 emulator
+- Gradle emitted the existing SDK XML version compatibility warning during `test`; validation still succeeded
+
+### Manual QA
+
+- Home query entry and one-time transfer to Programs passed; the emulator stylus tutorial obscured the first IME attempt, while the Compose test verifies the same controlled search action.
+- Program title/subject search, multi-filter draft/apply, filter count, individual chip removal, clear-all affordance, Title A–Z sorting, detail/back state retention, and natural result counts passed.
+- University name search and destination name search passed with real cached records.
+- Helpful zero-result content and clear-search action passed.
+- Bottom navigation, detail navigation, refresh-state code paths, and existing browse cards remained stable.
+- Search used the loaded Room-backed collections; a live offline transition was not forced, and no search endpoint is called by this flow.
+
+### Remaining Issues
+
+- University country names, program language/modes/deadlines, destination continent/currency, and comparable tuition currencies are unavailable in current list models and therefore are not searchable/filterable.
+- Search state is session-scoped ViewModel state rather than durable cross-process persistence.
+- University filter options are hidden when the derived list exceeds twelve entries to keep the filter sheet usable.
+
+### Next Recommended Bundle
+
+- Bundle 12 — Scholarships/Guides public API work in the web repo.
+
 ## 2026-07-12 — Bundle 10: Public Detail Screen Redesign
 
 - Rebuilt the shared detail component system around generic toolbars, concise heroes, safe external actions, compact facts, bordered sections, expandable narrative text, related-content rows, source status, and FAQ accordions.

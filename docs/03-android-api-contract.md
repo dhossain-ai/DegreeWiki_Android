@@ -68,8 +68,9 @@ This file records only contract surface verified from the Android repo and the c
   - `siteName: String`
   - `featureFlags: Map<String, Boolean>`
 - Declared in `DegreeWikiApiService`
-- Not verified as used by current Android screens
+- Not used by Android browse screens
 - Matching route file was not found in checked web repo source during this audit
+- Bundle 11 search/filter/sort runs locally over the existing Room-backed `/api/mobile/programs` collection and must not call this unverified route
 
 `GET /api/mobile/programs/search`
 
