@@ -1,5 +1,78 @@
 # Android Task Log
 
+## 2026-07-14 — Bundle 13: Scholarships + Guides Android
+
+- Added exact nullable Scholarship/Guide list and wrapped-detail DTOs from the read-only Bundle 12
+  web contract, plus separate domain models and defensive mapping.
+- Added tolerant structured Guide blocks: supported headings, paragraphs, ordered/unordered lists,
+  strong/emphasis, and safe HTTP(S) links map to native models; unknown blocks/inlines are skipped
+  and unsafe links become plain text.
+- Added Room `scholarships` and `guides` list-summary tables, DAOs, repository flows/refresh states,
+  and explicit additive database migration `2 -> 3` without dropping existing tables.
+- Added active Home cards and typed `Scholarships`, `ScholarshipDetail(slug)`, `Guides`, and
+  `GuideDetail(slug)` navigation while preserving the five existing bottom tabs.
+- Added polished cache-first Scholarship/Guide lists with loading, warning, error, retry, one-record,
+  and empty-state behavior; no search, filters, fake featured content, or image dependency.
+- Added Scholarship detail using the Bundle 10 hierarchy, safe official/apply actions, conditional
+  facts/sections, cautious deadline/verification presentation, and cached-summary fallback.
+- Added Guide detail with native article rendering, compact related-guide navigation, source status,
+  and cached-summary fallback. No WebView, executable HTML, or Markdown execution was introduced.
+- Kept web/backend, auth storage, network logging, Saved/Compare, Fit Finder, Chat, bottom navigation,
+  and existing Program/University/Country behavior out of scope.
+
+### Files Created
+
+- Scholarship/Guide DTO, domain, Room entity, DAO, mapper, list/detail ViewModel, screen, deadline,
+  card, and guide-renderer files under `app/src/main/java/com/example/degreewiki/`
+- `app/src/test/java/com/example/degreewiki/data/network/ScholarshipGuideDtoParsingTest.kt`
+- `app/src/test/java/com/example/degreewiki/data/mapper/GuideMapperTest.kt`
+- `app/src/test/java/com/example/degreewiki/ui/features/scholarships/ScholarshipDeadlineTest.kt`
+- `app/src/androidTest/java/com/example/degreewiki/ui/features/guides/GuideDetailContentTest.kt`
+
+### Files Modified
+
+- Network service, Room database/module, data repository, Home/Main/navigation Kotlin files
+- `HomeContentTest.kt`
+- Android architecture, API contract, design system, status, task log, product flow map, and mobile
+  UX blueprint docs
+
+### Files Deleted
+
+- none
+
+### Validation Results
+
+- `.\gradlew.bat test`: passed
+- `.\gradlew.bat build`: passed
+- `.\gradlew.bat lint`: passed
+- Focused unit tests and Android-test Kotlin compilation passed.
+- `connectedDebugAndroidTest` was intentionally not run; focused Compose coverage was proportional
+  for Home/related navigation and structured content.
+
+### Manual And API QA
+
+- Static/navigation review confirmed active Home entries, typed list/detail/related routes, normal
+  back callbacks, and unchanged bottom navigation.
+- Unit/Compose coverage verified deadline behavior, optional omission, supported/unknown content,
+  unsafe-link handling, Home navigation, native article content, and related-guide navigation.
+- Configured backend checks returned HTTP 500 for both `/api/mobile/scholarships` and
+  `/api/mobile/guides`; real-record list/detail, live offline transition, browser handoff, and visual
+  scrolling QA could not be completed against that environment in this run.
+
+### Remaining Issues
+
+- The configured public backend must deploy/fix the Bundle 12 routes before end-to-end real-data
+  device QA can be completed.
+- The explicit migration is compiled and schema-matched, but no Room migration instrumentation test
+  was added because the repo has no Room-testing dependency and this bundle adds no dependency.
+- Remote cover images remain optional initials fallbacks because no image dependency was added.
+
+### Next Recommended Bundle
+
+- First complete a short real-data device QA pass after the configured Scholarship/Guide routes
+  return 200. Then proceed to Bundle 14 — Profile/Saved Items without expanding this public browse
+  bundle into Saved, Compare, Fit Finder, or Chat.
+
 ## 2026-07-13 — Bundle 11: Search + Filter UX
 
 - Added pure local matching, derived filter options, multi-filter combination, and reliable program sorting.

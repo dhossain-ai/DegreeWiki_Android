@@ -1,6 +1,6 @@
 # Android Architecture
 
-Last audited: 2026-07-10
+Last audited: 2026-07-14 (Bundle 13)
 
 ## High-Level Shape
 
@@ -31,6 +31,11 @@ Verified navigation uses `androidx.navigation3`:
   - `ProgramDetail(id: String)`
   - `UniversityDetail(id: String)`
   - `CountryDetail(id: String)`
+  - `ScholarshipDetail(slug: String)`
+  - `GuideDetail(slug: String)`
+- Home-only browse destinations:
+  - `Scholarships`
+  - `Guides`
 
 Important limits:
 
@@ -48,6 +53,10 @@ Active features:
   programs, universities, countries lists
 - `details`
   program, university, country detail screens
+- `scholarships`
+  public scholarship browse/detail and deadline presentation
+- `guides`
+  public guide browse/detail and structured native content rendering
 - `auth`
   login form and auth state handling
 - `profile`
@@ -74,7 +83,7 @@ Observed inconsistency:
 ## Repository Layer
 
 - `DataRepository`
-  programs, universities, countries, and refresh methods
+  programs, universities, countries, scholarships, guides, detail fetches, and refresh methods
 - `AuthRepository`
   auth state, login, logout
 - `ProfileRepository`
@@ -82,7 +91,7 @@ Observed inconsistency:
 
 Observations:
 
-- `DataRepository` now owns small `StateFlow` refresh-status channels for programs, universities, and countries.
+- `DataRepository` owns small `StateFlow` refresh-status channels for programs, universities, countries, scholarships, and guides.
 - Each refresh path updates `PublicRefreshState(isRefreshing, lastRefreshFailed)` so ViewModels can distinguish:
   - initial loading with no cached data
   - cached-data success
@@ -115,10 +124,16 @@ Room database tables:
 - `universities`
 - `countries`
 - `saved_items`
+- `scholarships` (list summaries only)
+- `guides` (list summaries only)
 
 Notes:
 
-- DB version is `2`
+- DB version is `3`
+- `MIGRATION_2_3` creates the Scholarship and Guide list-cache tables without dropping Program,
+  University, Country, saved-item, or auth-adjacent data.
+- Rich Scholarship and Guide details remain in ViewModel memory. Their ViewModels observe the
+  cached list summary by slug and keep it visible when detail loading fails.
 - `fallbackToDestructiveMigration(true)` is enabled
 - No schema export
 

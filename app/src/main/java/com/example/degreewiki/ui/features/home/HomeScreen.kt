@@ -5,6 +5,8 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.MenuBook
 import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material.icons.filled.School
+import androidx.compose.material.icons.filled.CardGiftcard
+import androidx.compose.material.icons.automirrored.filled.Article
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -35,6 +37,8 @@ fun HomeScreen(
     onProgramsClick: (String) -> Unit,
     onUniversitiesClick: () -> Unit,
     onDestinationsClick: () -> Unit,
+    onScholarshipsClick: () -> Unit,
+    onGuidesClick: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: HomeViewModel = hiltViewModel()
 ) {
@@ -56,6 +60,8 @@ fun HomeScreen(
         onProgramsClick = onProgramsClick,
         onUniversitiesClick = onUniversitiesClick,
         onDestinationsClick = onDestinationsClick,
+        onScholarshipsClick = onScholarshipsClick,
+        onGuidesClick = onGuidesClick,
         onRefresh = viewModel::refresh,
         modifier = modifier
     )
@@ -67,6 +73,8 @@ fun HomeContent(
     onProgramsClick: (String) -> Unit,
     onUniversitiesClick: () -> Unit,
     onDestinationsClick: () -> Unit,
+    onScholarshipsClick: () -> Unit,
+    onGuidesClick: () -> Unit,
     onRefresh: () -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -125,6 +133,24 @@ fun HomeContent(
                 meta = naturalCount(state.programs.size, "program", "programs"),
                 icon = Icons.AutoMirrored.Filled.MenuBook,
                 onClick = { onProgramsClick("") }
+            )
+        }
+        item {
+            QuickBrowseCard(
+                title = "Scholarships",
+                description = "Explore funding opportunities for international study.",
+                meta = "Browse scholarships",
+                icon = Icons.Default.CardGiftcard,
+                onClick = onScholarshipsClick
+            )
+        }
+        item {
+            QuickBrowseCard(
+                title = "Guides",
+                description = "Read practical guidance for studying abroad.",
+                meta = "Browse study guides",
+                icon = Icons.AutoMirrored.Filled.Article,
+                onClick = onGuidesClick
             )
         }
         item {

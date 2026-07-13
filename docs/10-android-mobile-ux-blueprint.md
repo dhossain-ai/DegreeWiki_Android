@@ -1,6 +1,6 @@
 # DegreeWiki Android Mobile UX Blueprint
 
-Last updated: 2026-07-13 (Bundle 11 implementation notes)
+Last updated: 2026-07-14 (Bundle 13 implementation notes)
 
 ## 1. Purpose
 
@@ -339,7 +339,8 @@ Rules:
 
 ## 15. Scholarships And Guides Placement
 
-Near-term, Scholarships and Guides should appear as Home entry cards or an Explore section. They may receive public list/detail screens only after dedicated, verified API support exists.
+Scholarships and Guides now appear as active Home entry cards backed by dedicated verified APIs and
+Room-cached public list/detail flows. They remain outside bottom navigation.
 
 ### Scholarship Card
 
@@ -428,10 +429,23 @@ All content must be real. An entry card must not imply a live destination before
 
 - Home featured content uses compact horizontal rows with at most three real records per section.
 - The Home search entry routes to Programs until real search behavior is implemented.
-- No Scholarships or Guides entry cards are rendered yet because they have no supported Android navigation.
+- Scholarship and Guide entry cards now route to typed list/detail destinations.
 - Program, university, and country list cards use only the existing Room-backed domain fields.
 - Remote logos and destination images remain deferred; initials are used without adding an image-loading dependency.
 - Fit Finder appears only as a clearly deferred, non-clickable card.
+
+## Bundle 13 Implementation Notes
+
+- Scholarship browse/details use only real provider, funding, deadline, eligibility, relationship,
+  verification, and public-link fields. One-record and empty states are intentional; search,
+  filters, featured sections, fake statuses, and absent application-process fields are omitted.
+- Guide browse omits list read time, authors, tags, and featured badges because the list API does
+  not provide them. Optional images use the existing initials fallback.
+- Guide detail renders `structured_blocks_v1` natively with compact heading hierarchy, comfortable
+  paragraph spacing, indented lists, inline emphasis, safe HTTP(S) links, related-guide navigation,
+  and cautious verification presentation. No WebView or executable markup is involved.
+- Scholarship and Guide list summaries are cached in Room; rich detail remains in ViewModel memory
+  with cached-summary fallback. Student copy describes saved information without API/cache jargon.
 
 ## Bundle 10 Implementation Notes
 

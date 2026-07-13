@@ -2,6 +2,8 @@ package com.example.degreewiki.data.local
 
 import android.content.Context
 import androidx.room.Room
+import androidx.room.migration.Migration
+import androidx.sqlite.db.SupportSQLiteDatabase
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -13,6 +15,31 @@ import javax.inject.Singleton
 @InstallIn(SingletonComponent::class)
 object DatabaseModule {
 
+    val MIGRATION_2_3 = object : Migration(2, 3) {
+        override fun migrate(db: SupportSQLiteDatabase) {
+            db.execSQL(
+                """CREATE TABLE IF NOT EXISTS `scholarships` (
+                    `id` TEXT NOT NULL, `slug` TEXT NOT NULL, `title` TEXT NOT NULL,
+                    `providerName` TEXT, `summary` TEXT, `scholarshipTypeLabel` TEXT,
+                    `fundingTypeLabel` TEXT, `amountDisplay` TEXT, `deadline` TEXT,
+                    `deadlineText` TEXT, `deadlineDisplay` TEXT,
+                    `studyCountriesJson` TEXT NOT NULL, `degreeLevelsJson` TEXT NOT NULL,
+                    `subjectsJson` TEXT NOT NULL, `officialUrl` TEXT, `applicationUrl` TEXT,
+                    `verificationStatus` TEXT, `lastVerifiedAt` TEXT, `imageUrl` TEXT,
+                    `offlineSavedAt` INTEGER NOT NULL, PRIMARY KEY(`id`))""".trimIndent()
+            )
+            db.execSQL(
+                """CREATE TABLE IF NOT EXISTS `guides` (
+                    `id` TEXT NOT NULL, `slug` TEXT NOT NULL, `title` TEXT NOT NULL,
+                    `summary` TEXT, `categoryId` TEXT, `categorySlug` TEXT, `categoryName` TEXT,
+                    `countriesJson` TEXT NOT NULL, `subjectsJson` TEXT NOT NULL,
+                    `degreeLevelsJson` TEXT NOT NULL, `publishedAt` TEXT, `updatedAt` TEXT,
+                    `coverImageUrl` TEXT, `offlineSavedAt` INTEGER NOT NULL,
+                    PRIMARY KEY(`id`))""".trimIndent()
+            )
+        }
+    }
+
     @Provides
     @Singleton
     fun provideDatabase(
@@ -23,6 +50,7 @@ object DatabaseModule {
             DegreeWikiDatabase::class.java,
             "degreewiki.db"
         )
+        .addMigrations(MIGRATION_2_3)
         .fallbackToDestructiveMigration(true)
         .build()
     }
@@ -44,4 +72,12 @@ object DatabaseModule {
     @Provides
     @Singleton
     fun provideProgramDao(database: DegreeWikiDatabase) = database.programDao()
+
+    @Provides
+    @Singleton
+    fun provideScholarshipDao(database: DegreeWikiDatabase) = database.scholarshipDao()
+
+    @Provides
+    @Singleton
+    fun provideGuideDao(database: DegreeWikiDatabase) = database.guideDao()
 }

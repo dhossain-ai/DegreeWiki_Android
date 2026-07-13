@@ -53,6 +53,31 @@ fun MainNavigation() {
                     onUniversityClick = { id -> backStack.add(UniversityDetail(id)) }
                 )
             }
+            entry<Scholarships> {
+                com.example.degreewiki.ui.features.scholarships.ScholarshipsScreen(
+                    onItemClick = { slug -> backStack.add(ScholarshipDetail(slug)) },
+                    modifier = Modifier.safeDrawingPadding().padding(16.dp)
+                )
+            }
+            entry<ScholarshipDetail> { key ->
+                com.example.degreewiki.ui.features.scholarships.ScholarshipDetailScreen(
+                    navKey = key,
+                    onBackClick = { backStack.removeLastOrNull() }
+                )
+            }
+            entry<Guides> {
+                com.example.degreewiki.ui.features.guides.GuidesScreen(
+                    onItemClick = { slug -> backStack.add(GuideDetail(slug)) },
+                    modifier = Modifier.safeDrawingPadding().padding(16.dp)
+                )
+            }
+            entry<GuideDetail> { key ->
+                com.example.degreewiki.ui.features.guides.GuideDetailScreen(
+                    navKey = key,
+                    onBackClick = { backStack.removeLastOrNull() },
+                    onRelatedGuideClick = { slug -> backStack.add(GuideDetail(slug)) }
+                )
+            }
         }
     )
 }

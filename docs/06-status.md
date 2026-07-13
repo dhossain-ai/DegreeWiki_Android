@@ -1,6 +1,39 @@
 # Android Status
 
-Last updated: 2026-07-13
+Last updated: 2026-07-14
+
+## Bundle 13 Status — Scholarships + Guides Android
+
+- Status: implemented and validated.
+- Home now has active Scholarship and Guide entry cards; typed list/detail destinations use normal
+  back-stack behavior while bottom navigation remains Home, Programs, Universities, Countries,
+  Profile.
+- Android consumes the raw Scholarship/Guide lists and wrapped `{ ok, item }` details documented by
+  Bundle 12 with nullable DTOs, separate domain models, and safe mapping.
+- Room database version 3 adds list-summary caches through explicit additive `MIGRATION_2_3` tables;
+  existing Program, University, Country, saved-item, and auth-adjacent data is preserved.
+- Scholarship browse/detail uses real funding, deadlines, relationships, official links, and
+  verification data only. Past/future dates are parsed defensively; unsupported status and absent
+  application-process fields are never invented.
+- Guide browse/detail renders `structured_blocks_v1` natively with headings, paragraphs, ordered and
+  unordered lists, emphasis, safe HTTP(S) links, and related-guide navigation. Unknown blocks are
+  skipped, unsafe links become plain text, and no HTML/WebView/Markdown execution is used.
+- Cached lists remain visible after refresh failure; cached summaries remain useful when rich detail
+  fails. UI never exposes raw exceptions or API/cache terminology.
+
+## Bundle 13 Validation
+
+- `.\gradlew.bat test`: passed
+- `.\gradlew.bat build`: passed
+- `.\gradlew.bat lint`: passed
+- Focused `testDebugUnitTest compileDebugAndroidTestKotlin`: passed before final validation
+- Focused tests cover list/wrapped DTO parsing, optional fields, past/future/missing/malformed
+  deadlines, supported/unknown Guide blocks, safe/unsafe links, Home entry navigation, structured
+  content, and related-guide navigation.
+- `connectedDebugAndroidTest` was not run because focused Compose tests compiled and the requested
+  behavior did not require a broader emulator matrix.
+- Configured public endpoint QA on 2026-07-14 returned HTTP 500 for both Scholarship and Guide list
+  routes, so real-data device QA remains blocked until the configured backend deploy is healthy.
 
 ## Bundle 11 Status — Search + Filter UX
 
@@ -76,7 +109,7 @@ Last updated: 2026-07-13
 - Cached content remains visible if rich detail loading fails.
 - Login works through supported credentials; fake Google sign-in is not present.
 - Chat and Fit Finder are not exposed as fake working tabs.
-- Scholarships and Guides remain unimplemented on Android.
+- Scholarships and Guides are active public Home-entry browse/detail flows with Room list caching.
 
 ## Bundle 8 Validation
 
@@ -90,9 +123,10 @@ Last updated: 2026-07-13
 - Current screen copy and hierarchy still reflect developer-MVP patterns and have not yet been redesigned in code.
 - Browse cards need shorter text, better comparison facts, and stronger visual hierarchy.
 - Rich detail sections need clearer structure and actionable official links.
-- Search/filter, saved items, Scholarships/Guides, Fit Finder, and Chat remain future work.
+- Saved-items product UX, Fit Finder, and Chat remain future work.
 - The open UX decisions in `docs/10-android-mobile-ux-blueprint.md` require resolution during the relevant implementation bundles.
 
 ## Next Recommended Bundle
 
-Bundle 12 — Scholarships/Guides public API work in the web repo, scoped separately from Android.
+Bundle 14 — Profile/Saved Items, after the configured Scholarship/Guide backend routes are deployed
+and real-data device QA for Bundle 13 is completed.

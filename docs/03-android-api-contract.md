@@ -1,6 +1,35 @@
 # Android API Contract
 
-Last audited: 2026-07-11
+Last audited: 2026-07-14 (Bundle 13)
+
+## Bundle 13 Scholarships And Guides
+
+Android consumes the Bundle 12 contract documented read-only in
+`W:\DegreeWiki\docs\11-mobile-api.md`:
+
+- `GET /api/mobile/scholarships` -> raw `List<ScholarshipDto>`
+- `GET /api/mobile/scholarships/{slug}` -> `DetailResponse<ScholarshipDetailDto>`
+- `GET /api/mobile/guides` -> raw `List<GuideDto>`
+- `GET /api/mobile/guides/{slug}` -> `DetailResponse<GuideDetailDto>`
+
+Scholarship list DTOs preserve nullable provider/classification labels, summary, numeric/display
+amounts, ISO/free-text/display deadlines, study countries, degree levels, subjects, safe public
+URLs, verification dates/status, update date, and optional image URL. Detail DTOs add plain-text
+overview/coverage/eligibility, structured amount/deadline objects, nationality rules, named
+country/degree/subject/university relations, program summaries, provider URL, confidence metadata,
+and public media URLs. The client never invents active/open/closing-soon state.
+
+Guide list DTOs preserve nullable summary/category, country/subject/degree relationships,
+publication/update dates, and optional cover URL. Detail DTOs add reading time, verification data,
+related guides, and `structured_blocks_v1`. Blocks are structurally decoded as nullable
+`type`, `level`, `children`, and `items` fields so unknown future block types still parse. Mapping
+supports only `heading`, `paragraph`, `ul`, and `ol`; inline `text`, `strong`, `em`, and safe
+HTTP(S) `link` nodes are supported. Unknown blocks/inlines are skipped and unsafe links become
+non-clickable plain text. No HTML, Markdown execution, or WebView is used.
+
+Both list contracts cache summaries in Room. Wrapped rich details are mapped into domain models
+and retained only in ViewModel memory. A missing, malformed, 404, or failed detail call returns
+`null` from the repository while the cached list summary remains available to the screen.
 
 ## Bundle 7 rich public API update
 
@@ -270,7 +299,10 @@ Highlights:
 - University list pages already use official URL, ranking summary, verification status, source-check date, and program-count context.
 - University detail pages additionally use short/native names, admissions links, language requirement overview, scholarship overview, housing overview, student life, international student support, and career support.
 - Destination detail pages additionally use ISO/currency/capital/language facts, tuition and living-cost ranges, visa and work guidance, official URLs, FAQ data, and verification metadata.
-- Scholarships and guides have public web list/detail pages, but no matching Android public flow and no verified `src/pages/api/mobile` route files for them.
+- Scholarship and Guide mobile list/detail contracts are verified and consumed by the Android
+  public Home-entry flows. Authors, tags, featured state, scholarship opening dates, application
+  steps, required documents, selection process, and contact fields are intentionally absent because
+  the verified API does not model them.
 
 ## Future Endpoint Recommendations
 
