@@ -1,5 +1,35 @@
 # Android Task Log
 
+## 2026-07-15 — Bundle 13.1: Scholarship + Guide Live Production QA
+
+- Installed Bundle 13 over the existing Pixel 8 emulator installation without clearing data. The
+  pre-existing `degreewiki.db` remained present across the Room version-3 install, preserving the
+  earlier Program/University/Country cache while adding the Scholarship/Guide summary tables.
+- Production QA passed for `GET /api/mobile/scholarships`, its Romanian Government Scholarship
+  detail, `GET /api/mobile/guides`, and the Erasmus Mundus guide detail. The device showed the
+  real scholarship provider, summary, funding amount, future deadline, verification label, and
+  optional-section omission correctly. There is no live related-guide row in the current response,
+  so no related-guide action was displayed to exercise.
+- All three published guides rendered in the list. The real long-form guide displayed headings,
+  paragraphs, emphasis/list content, and safe text content through repeated scrolling without a
+  crash or developer-facing error.
+- After a successful live load, forced offline launch retained cached browse data and displayed the
+  shared refresh-failure warning on cached content. No app data was cleared during this check.
+- Regression spot-check passed for Home, Program browse/search cache, bottom navigation, and
+  remaining public/profile entry points. No Android code defect was found; no test or dependency
+  change was needed.
+
+### Files Modified
+
+- `docs/06-status.md`
+- `docs/07-task-log.md`
+
+### Remaining Issues
+
+- None blocking Bundle 14. The current production guide data does not include an eligible related
+  guide for a live related-navigation interaction; existing focused Compose coverage remains the
+  coverage for that conditional path.
+
 ## 2026-07-14 — Bundle 13: Scholarships + Guides Android
 
 - Added exact nullable Scholarship/Guide list and wrapped-detail DTOs from the read-only Bundle 12

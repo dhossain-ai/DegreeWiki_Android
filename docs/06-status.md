@@ -1,6 +1,6 @@
 # Android Status
 
-Last updated: 2026-07-14
+Last updated: 2026-07-15
 
 ## Bundle 13 Status — Scholarships + Guides Android
 
@@ -32,8 +32,16 @@ Last updated: 2026-07-14
   content, and related-guide navigation.
 - `connectedDebugAndroidTest` was not run because focused Compose tests compiled and the requested
   behavior did not require a broader emulator matrix.
-- Configured public endpoint QA on 2026-07-14 returned HTTP 500 for both Scholarship and Guide list
-  routes, so real-data device QA remains blocked until the configured backend deploy is healthy.
+- The 2026-07-14 backend `500` blocker is resolved. Live Pixel 8 emulator QA against production
+  returned the Romanian Government Scholarship and all three published guides. Scholarship and
+  guide details loaded with their real slugs; the guide rendered real headings, paragraphs, and
+  unordered list content through long scrolling without a crash.
+- The existing pre-Bundle-13 installation upgraded in place with `degreewiki.db` retained; no app
+  data was cleared. Program data remained available after the migration. Scholarship and guide
+  list records were written to Room and remained visible after a forced offline launch; the shared
+  refresh warning was observed on cached browse content.
+- Home, Programs, Universities, Countries, Profile, search/filter entry points, and the unchanged
+  five-item bottom navigation remained available. No live-data defect required an Android code fix.
 
 ## Bundle 11 Status — Search + Filter UX
 
@@ -128,5 +136,4 @@ Last updated: 2026-07-14
 
 ## Next Recommended Bundle
 
-Bundle 14 — Profile/Saved Items, after the configured Scholarship/Guide backend routes are deployed
-and real-data device QA for Bundle 13 is completed.
+Bundle 14 — Profile/Saved Items. Bundle 13 has passed its live production QA gate.
