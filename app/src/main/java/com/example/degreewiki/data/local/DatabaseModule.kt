@@ -40,6 +40,25 @@ object DatabaseModule {
         }
     }
 
+    val MIGRATION_3_4 = object : Migration(3, 4) {
+        override fun migrate(db: SupportSQLiteDatabase) {
+            db.execSQL("DROP TABLE IF EXISTS `saved_items`")
+            db.execSQL(
+                """CREATE TABLE IF NOT EXISTS `saved_items` (
+                    `ownerUserId` TEXT NOT NULL, `savedItemId` TEXT NOT NULL,
+                    `programId` TEXT NOT NULL, `slug` TEXT NOT NULL, `title` TEXT NOT NULL,
+                    `universityName` TEXT, `countryName` TEXT, `degreeLevel` TEXT,
+                    `subject` TEXT, `tuitionDisplay` TEXT, `durationMonths` INTEGER,
+                    `duration` TEXT, `savedAt` TEXT NOT NULL,
+                    PRIMARY KEY(`ownerUserId`, `savedItemId`))""".trimIndent()
+            )
+            db.execSQL(
+                "CREATE UNIQUE INDEX IF NOT EXISTS `index_saved_items_ownerUserId_programId` " +
+                    "ON `saved_items` (`ownerUserId`, `programId`)"
+            )
+        }
+    }
+
     @Provides
     @Singleton
     fun provideDatabase(
@@ -50,7 +69,7 @@ object DatabaseModule {
             DegreeWikiDatabase::class.java,
             "degreewiki.db"
         )
-        .addMigrations(MIGRATION_2_3)
+        .addMigrations(MIGRATION_2_3, MIGRATION_3_4)
         .fallbackToDestructiveMigration(true)
         .build()
     }

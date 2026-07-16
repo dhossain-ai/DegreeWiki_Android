@@ -4,6 +4,10 @@ import kotlinx.serialization.Serializable
 import retrofit2.http.GET
 import retrofit2.http.Query
 import retrofit2.http.Path
+import retrofit2.http.Body
+import retrofit2.http.DELETE
+import retrofit2.http.Headers
+import retrofit2.http.POST
 import com.example.degreewiki.data.network.dto.*
 
 @Serializable
@@ -70,12 +74,19 @@ interface DegreeWikiApiService {
     @GET("api/mobile/guides/{slug}")
     suspend fun getGuideDetail(@Path("slug") slug: String): DetailResponse<GuideDetailDto>
 
+    @Headers("$AUTHENTICATED_REQUEST_HEADER: true")
     @GET("api/mobile/me")
-    suspend fun getProfile(): com.example.degreewiki.data.network.dto.UserProfileDto
+    suspend fun getProfile(): UserProfileResponseDto
 
+    @Headers("$AUTHENTICATED_REQUEST_HEADER: true")
     @GET("api/mobile/me/saved-items")
-    suspend fun getSavedItems(): List<com.example.degreewiki.data.network.dto.SavedItemDto>
+    suspend fun getSavedItems(): SavedItemsResponseDto
 
-    @retrofit2.http.DELETE("api/mobile/me/saved-items/{id}")
-    suspend fun deleteSavedItem(@retrofit2.http.Path("id") id: String)
+    @Headers("$AUTHENTICATED_REQUEST_HEADER: true")
+    @POST("api/mobile/me/saved-items")
+    suspend fun saveProgram(@Body request: SaveProgramRequestDto): SaveProgramResponseDto
+
+    @Headers("$AUTHENTICATED_REQUEST_HEADER: true")
+    @DELETE("api/mobile/me/saved-items/{savedItemId}")
+    suspend fun deleteSavedItem(@Path("savedItemId") savedItemId: String): DeleteSavedItemResponseDto
 }

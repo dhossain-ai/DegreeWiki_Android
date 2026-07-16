@@ -39,9 +39,9 @@ class AuthViewModel @Inject constructor(
             try {
                 authRepository.loginWithEmail(email, password)
                 _loginUiState.value = LoginUiState.Idle
-            } catch (e: Exception) {
+            } catch (_: Exception) {
                 _loginUiState.value = LoginUiState.Error(
-                    e.message ?: "Login failed. Please try again."
+                    "We couldn’t log you in. Check your details and try again."
                 )
             }
         }

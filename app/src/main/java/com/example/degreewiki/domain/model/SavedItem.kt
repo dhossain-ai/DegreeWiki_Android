@@ -1,11 +1,22 @@
 package com.example.degreewiki.domain.model
 
-data class SavedItem(
-    val id: String,
-    val entityType: String,
-    val entityId: String,
-    val title: String,
+data class SavedProgram(
+    val savedItemId: String,
+    val programId: String,
     val slug: String,
-    val thumbnailUrl: String?,
-    val savedAt: Long
+    val title: String,
+    val universityName: String?,
+    val countryName: String?,
+    val degreeLevel: String?,
+    val subject: String?,
+    val tuitionDisplay: String?,
+    val durationMonths: Int?,
+    val duration: String?,
+    val savedAt: String
 )
+
+fun List<SavedProgram>.savedItemIdByProgramId(): Map<String, String> =
+    associate { it.programId to it.savedItemId }
+
+fun List<SavedProgram>.distinctByProgramId(): List<SavedProgram> =
+    distinctBy(SavedProgram::programId)

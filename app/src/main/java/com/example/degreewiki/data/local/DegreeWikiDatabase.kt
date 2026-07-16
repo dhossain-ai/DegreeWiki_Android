@@ -23,7 +23,7 @@ import com.example.degreewiki.data.local.entity.GuideEntity
         ScholarshipEntity::class,
         GuideEntity::class
     ],
-    version = 3,
+    version = 4,
     exportSchema = false
 )
 abstract class DegreeWikiDatabase : RoomDatabase() {
