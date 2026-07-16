@@ -23,6 +23,7 @@ import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.filled.School
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
@@ -33,6 +34,8 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -54,9 +57,11 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun LoginScreen(
     modifier: Modifier = Modifier,
+    onBackClick: (() -> Unit)? = null,
     viewModel: AuthViewModel = hiltViewModel()
 ) {
     val loginUiState by viewModel.loginUiState.collectAsStateWithLifecycle()
@@ -68,6 +73,13 @@ fun LoginScreen(
 
     val snackbarHostState = remember { SnackbarHostState() }
     val focusManager = LocalFocusManager.current
+    val authState by viewModel.authState.collectAsStateWithLifecycle()
+
+    LaunchedEffect(authState) {
+        if (authState is com.example.degreewiki.data.repository.AuthState.Authenticated) {
+            onBackClick?.invoke()
+        }
+    }
 
     // Show error in snackbar
     LaunchedEffect(loginUiState) {
@@ -80,6 +92,18 @@ fun LoginScreen(
     }
 
     Scaffold(
+        topBar = {
+            onBackClick?.let {
+                TopAppBar(
+                    title = { Text("Log in") },
+                    navigationIcon = {
+                        IconButton(onClick = it) {
+                            Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+                        }
+                    }
+                )
+            }
+        },
         snackbarHost = { SnackbarHost(snackbarHostState) },
         modifier = modifier
     ) { innerPadding ->

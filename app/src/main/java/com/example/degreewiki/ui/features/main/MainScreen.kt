@@ -1,23 +1,14 @@
 package com.example.degreewiki.ui.features.main
 
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation3.runtime.NavKey
-import com.example.degreewiki.data.repository.AuthState
-import com.example.degreewiki.ui.features.auth.AuthViewModel
-import com.example.degreewiki.ui.features.auth.LoginScreen
 import com.example.degreewiki.ui.features.discover.CountriesScreen
 import com.example.degreewiki.ui.features.discover.ProgramsScreen
 import com.example.degreewiki.ui.features.discover.UniversitiesScreen
@@ -27,13 +18,12 @@ import com.example.degreewiki.ui.features.profile.ProfileScreen
 @Composable
 fun MainScreen(
     onItemClick: (NavKey) -> Unit,
-    modifier: Modifier = Modifier,
-    authViewModel: AuthViewModel = hiltViewModel()
+    initialTab: DiscoveryTab = DiscoveryTab.HOME,
+    modifier: Modifier = Modifier
 ) {
-    var currentTab by rememberSaveable { mutableStateOf(DiscoveryTab.HOME) }
+    var currentTab by rememberSaveable { mutableStateOf(initialTab) }
     var nextProgramQueryRequestId by rememberSaveable { mutableStateOf(0L) }
     var programQueryRequest by rememberSaveable { mutableStateOf<Pair<Long, String>?>(null) }
-    val authState by authViewModel.authState.collectAsStateWithLifecycle()
 
     Scaffold(
         bottomBar = {
@@ -55,10 +45,12 @@ fun MainScreen(
                 onDestinationsClick = { currentTab = DiscoveryTab.COUNTRIES },
                 onScholarshipsClick = { onItemClick(com.example.degreewiki.ui.navigation.Scholarships) },
                 onGuidesClick = { onItemClick(com.example.degreewiki.ui.navigation.Guides) },
+                onLoginRequired = { onItemClick(com.example.degreewiki.ui.navigation.Login) },
                 modifier = Modifier.padding(innerPadding)
             )
             DiscoveryTab.PROGRAMS -> ProgramsScreen(
                 onItemClick = { id -> onItemClick(com.example.degreewiki.ui.navigation.ProgramDetail(id)) },
+                onLoginRequired = { onItemClick(com.example.degreewiki.ui.navigation.Login) },
                 queryRequest = programQueryRequest,
                 onQueryRequestConsumed = { programQueryRequest = null },
                 modifier = Modifier.padding(innerPadding)
@@ -72,19 +64,13 @@ fun MainScreen(
                 modifier = Modifier.padding(innerPadding)
             )
             DiscoveryTab.PROFILE -> {
-                when (authState) {
-                    is AuthState.Loading -> {
-                        Box(modifier = Modifier.fillMaxSize().padding(innerPadding), contentAlignment = Alignment.Center) {
-                            CircularProgressIndicator()
-                        }
-                    }
-                    is AuthState.Unauthenticated -> {
-                        LoginScreen(modifier = Modifier.padding(innerPadding))
-                    }
-                    is AuthState.Authenticated -> {
-                        ProfileScreen(modifier = Modifier.padding(innerPadding))
-                    }
-                }
+                ProfileScreen(
+                    onLoginClick = { onItemClick(com.example.degreewiki.ui.navigation.Login) },
+                    onSavedProgramsClick = {
+                        onItemClick(com.example.degreewiki.ui.navigation.SavedPrograms)
+                    },
+                    modifier = Modifier.padding(innerPadding)
+                )
             }
         }
     }

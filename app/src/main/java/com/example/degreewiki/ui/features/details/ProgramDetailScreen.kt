@@ -5,6 +5,10 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -13,18 +17,39 @@ import com.example.degreewiki.ui.components.DegreeWikiScreen
 import com.example.degreewiki.ui.components.LoadingState
 import java.text.NumberFormat
 import java.util.Locale
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
+import com.example.degreewiki.data.repository.SaveProgramResult
+import com.example.degreewiki.ui.components.LoginToSavePrompt
+import com.example.degreewiki.ui.components.ProgramSaveButton
 
 @Composable
 fun ProgramDetailScreen(
     navKey: com.example.degreewiki.ui.navigation.ProgramDetail,
     onBackClick: () -> Unit,
+    onLoginRequired: () -> Unit,
 ) {
     val viewModel = hiltViewModel<ProgramDetailViewModel, ProgramDetailViewModel.Factory>(
         creationCallback = { factory -> factory.create(navKey) }
     )
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val snackbar = remember { SnackbarHostState() }
+    var showLoginPrompt by remember { mutableStateOf(false) }
 
-    Scaffold(topBar = { DetailTopBar(title = "Program details", onBackClick = onBackClick) }) { innerPadding ->
+    LaunchedEffect(viewModel) {
+        viewModel.saveEvents.collect { result ->
+            when (result) {
+                SaveProgramResult.LoginRequired -> showLoginPrompt = true
+                is SaveProgramResult.Failure -> snackbar.showSnackbar(result.message)
+                SaveProgramResult.Success -> Unit
+            }
+        }
+    }
+
+    Scaffold(
+        topBar = { DetailTopBar(title = "Program details", onBackClick = onBackClick) },
+        snackbarHost = { SnackbarHost(snackbar) }
+    ) { innerPadding ->
         when {
             uiState.isLoading -> LoadingState(Modifier.padding(innerPadding), "Loading program details")
             uiState.program == null -> DetailUnavailableState(
@@ -34,13 +59,31 @@ fun ProgramDetailScreen(
                 onActionClick = onBackClick,
                 modifier = Modifier.padding(innerPadding)
             )
-            else -> ProgramDetailContent(uiState = uiState, modifier = Modifier.padding(innerPadding))
+            else -> ProgramDetailContent(
+                uiState = uiState,
+                onSaveClick = viewModel::toggleSaved,
+                modifier = Modifier.padding(innerPadding)
+            )
         }
+    }
+
+    if (showLoginPrompt) {
+        LoginToSavePrompt(
+            onDismiss = { showLoginPrompt = false },
+            onLogIn = {
+                showLoginPrompt = false
+                onLoginRequired()
+            }
+        )
     }
 }
 
 @Composable
-internal fun ProgramDetailContent(uiState: ProgramDetailUiState, modifier: Modifier = Modifier) {
+internal fun ProgramDetailContent(
+    uiState: ProgramDetailUiState,
+    onSaveClick: () -> Unit = {},
+    modifier: Modifier = Modifier
+) {
     val program = uiState.program ?: return
     val detail = uiState.detail
     val location = detail?.location?.takeIf(String::isNotBlank) ?: program.countryName
@@ -81,6 +124,13 @@ internal fun ProgramDetailContent(uiState: ProgramDetailUiState, modifier: Modif
                     detail?.studyModeLabel?.takeIf(String::isNotBlank),
                     detail?.deliveryModeLabel?.takeIf(String::isNotBlank)
                 )
+            )
+        }
+        item {
+            ProgramSaveButton(
+                isSaved = uiState.isSaved,
+                isLoading = uiState.isSavePending,
+                onClick = onSaveClick
             )
         }
         item {

@@ -14,6 +14,8 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -31,6 +33,12 @@ import com.example.degreewiki.ui.components.RefreshWarningNote
 import com.example.degreewiki.ui.components.SectionHeader
 import com.example.degreewiki.ui.components.TrustNote
 import com.example.degreewiki.ui.components.UniversityBrowseCard
+import com.example.degreewiki.ui.components.LoginToSavePrompt
+import com.example.degreewiki.data.repository.SaveProgramResult
+import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.foundation.layout.Box
+import androidx.compose.ui.Alignment
 
 @Composable
 fun HomeScreen(
@@ -39,10 +47,23 @@ fun HomeScreen(
     onDestinationsClick: () -> Unit,
     onScholarshipsClick: () -> Unit,
     onGuidesClick: () -> Unit,
+    onLoginRequired: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: HomeViewModel = hiltViewModel()
 ) {
     val state by viewModel.uiState.collectAsStateWithLifecycle()
+    var showLoginPrompt by rememberSaveable { mutableStateOf(false) }
+    val snackbar = remember { SnackbarHostState() }
+
+    LaunchedEffect(viewModel) {
+        viewModel.saveEvents.collect { result ->
+            when (result) {
+                SaveProgramResult.LoginRequired -> showLoginPrompt = true
+                is SaveProgramResult.Failure -> snackbar.showSnackbar(result.message)
+                SaveProgramResult.Success -> Unit
+            }
+        }
+    }
 
     if (state.showFullError) {
         ErrorState(
@@ -62,9 +83,23 @@ fun HomeScreen(
         onDestinationsClick = onDestinationsClick,
         onScholarshipsClick = onScholarshipsClick,
         onGuidesClick = onGuidesClick,
+        onSaveClick = viewModel::toggleSaved,
         onRefresh = viewModel::refresh,
         modifier = modifier
     )
+
+    Box(modifier = modifier) {
+        SnackbarHost(snackbar, modifier = Modifier.align(Alignment.BottomCenter))
+    }
+    if (showLoginPrompt) {
+        LoginToSavePrompt(
+            onDismiss = { showLoginPrompt = false },
+            onLogIn = {
+                showLoginPrompt = false
+                onLoginRequired()
+            }
+        )
+    }
 }
 
 @Composable
@@ -75,6 +110,7 @@ fun HomeContent(
     onDestinationsClick: () -> Unit,
     onScholarshipsClick: () -> Unit,
     onGuidesClick: () -> Unit,
+    onSaveClick: (com.example.degreewiki.domain.model.Program) -> Unit = {},
     onRefresh: () -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -181,6 +217,9 @@ fun HomeContent(
                     ProgramBrowseCard(
                         program = program,
                         onClick = { onProgramsClick("") },
+                        isSaved = program.id in state.savedProgramIds,
+                        isSaveLoading = program.id in state.pendingProgramIds,
+                        onSaveClick = { onSaveClick(program) },
                         modifier = cardModifier
                     )
                 }

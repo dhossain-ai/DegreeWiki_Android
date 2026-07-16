@@ -175,6 +175,9 @@ fun ImageOrInitials(
 fun ProgramBrowseCard(
     program: Program,
     onClick: () -> Unit,
+    isSaved: Boolean = false,
+    isSaveLoading: Boolean = false,
+    onSaveClick: (() -> Unit)? = null,
     modifier: Modifier = Modifier
 ) {
     DegreeWikiCard(modifier = modifier, onClick = onClick) {
@@ -212,6 +215,13 @@ fun ProgramBrowseCard(
                     program.duration?.takeIf(String::isNotBlank)
                 )
             )
+            onSaveClick?.let {
+                ProgramSaveButton(
+                    isSaved = isSaved,
+                    isLoading = isSaveLoading,
+                    onClick = it
+                )
+            }
         }
     }
 }

@@ -14,7 +14,7 @@ import com.example.degreewiki.ui.features.main.MainScreen
 
 @Composable
 fun MainNavigation() {
-    val backStack = rememberNavBackStack(Main)
+    val backStack = rememberNavBackStack(Main())
 
     NavDisplay(
         backStack = backStack,
@@ -24,18 +24,41 @@ fun MainNavigation() {
             rememberViewModelStoreNavEntryDecorator()
         ),
         entryProvider = entryProvider {
-            entry<Main> {
+            entry<Main> { key ->
                 MainScreen(
                     onItemClick = { navKey -> backStack.add(navKey) },
+                    initialTab = runCatching {
+                        com.example.degreewiki.ui.features.main.DiscoveryTab.valueOf(key.initialTab)
+                    }.getOrDefault(com.example.degreewiki.ui.features.main.DiscoveryTab.HOME),
                     modifier = Modifier
                         .safeDrawingPadding()
                         .padding(16.dp)
                 )
             }
+            entry<Login> {
+                com.example.degreewiki.ui.features.auth.LoginScreen(
+                    onBackClick = { backStack.removeLastOrNull() }
+                )
+            }
+            entry<SavedPrograms> {
+                com.example.degreewiki.ui.features.profile.SavedProgramsScreen(
+                    onBackClick = { backStack.removeLastOrNull() },
+                    onProgramClick = { id -> backStack.add(ProgramDetail(id)) },
+                    onExplorePrograms = {
+                        backStack.clear()
+                        backStack.add(Main(initialTab = "PROGRAMS"))
+                    },
+                    onLoginRequired = {
+                        backStack.removeLastOrNull()
+                        backStack.add(Login)
+                    }
+                )
+            }
             entry<ProgramDetail> { key ->
                 com.example.degreewiki.ui.features.details.ProgramDetailScreen(
                     navKey = key,
-                    onBackClick = { backStack.removeLastOrNull() }
+                    onBackClick = { backStack.removeLastOrNull() },
+                    onLoginRequired = { backStack.add(Login) }
                 )
             }
             entry<UniversityDetail> { key ->

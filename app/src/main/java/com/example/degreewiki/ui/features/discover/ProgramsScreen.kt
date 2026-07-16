@@ -10,6 +10,11 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.foundation.layout.Box
+import androidx.compose.ui.Alignment
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -28,18 +33,33 @@ import com.example.degreewiki.ui.components.ProgramBrowseCard
 import com.example.degreewiki.ui.components.RefreshWarningNote
 import com.example.degreewiki.ui.components.ScreenHero
 import com.example.degreewiki.ui.components.SearchEmptyState
+import com.example.degreewiki.ui.components.LoginToSavePrompt
+import com.example.degreewiki.data.repository.SaveProgramResult
 
 @Composable
 fun ProgramsScreen(
     onItemClick: (String) -> Unit,
     queryRequest: Pair<Long, String>? = null,
     onQueryRequestConsumed: () -> Unit = {},
+    onLoginRequired: () -> Unit = {},
     viewModel: ProgramsViewModel = hiltViewModel(),
     modifier: Modifier = Modifier
 ) {
     val state by viewModel.uiState.collectAsStateWithLifecycle()
     var showFilters by rememberSaveable { mutableStateOf(false) }
     var showSort by rememberSaveable { mutableStateOf(false) }
+    var showLoginPrompt by rememberSaveable { mutableStateOf(false) }
+    val snackbarHostState = remember { SnackbarHostState() }
+
+    LaunchedEffect(viewModel) {
+        viewModel.saveEvents.collect { result ->
+            when (result) {
+                SaveProgramResult.LoginRequired -> showLoginPrompt = true
+                is SaveProgramResult.Failure -> snackbarHostState.showSnackbar(result.message)
+                SaveProgramResult.Success -> Unit
+            }
+        }
+    }
 
     LaunchedEffect(queryRequest?.first) {
         queryRequest?.let {
@@ -67,8 +87,26 @@ fun ProgramsScreen(
             onClearFilters = viewModel::clearFilters,
             onClearSearch = viewModel::clearSearch,
             onItemClick = onItemClick,
+            onSaveClick = viewModel::toggleSaved,
             onRefresh = viewModel::refresh,
             modifier = modifier
+        )
+    }
+
+    Box(modifier = modifier.fillMaxWidth()) {
+        SnackbarHost(
+            hostState = snackbarHostState,
+            modifier = Modifier.align(Alignment.BottomCenter)
+        )
+    }
+
+    if (showLoginPrompt) {
+        LoginToSavePrompt(
+            onDismiss = { showLoginPrompt = false },
+            onLogIn = {
+                showLoginPrompt = false
+                onLoginRequired()
+            }
         )
     }
 
@@ -100,6 +138,7 @@ internal fun ProgramsContent(
     onClearFilters: () -> Unit,
     onClearSearch: () -> Unit,
     onItemClick: (String) -> Unit,
+    onSaveClick: (Program) -> Unit,
     onRefresh: () -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -153,7 +192,13 @@ internal fun ProgramsContent(
             }
         } else {
             items(state.results, key = { it.id }) { program ->
-                ProgramBrowseCard(program, onClick = { onItemClick(program.id) })
+                ProgramBrowseCard(
+                    program = program,
+                    onClick = { onItemClick(program.id) },
+                    isSaved = program.id in state.savedProgramIds,
+                    isSaveLoading = program.id in state.pendingProgramIds,
+                    onSaveClick = { onSaveClick(program) }
+                )
             }
         }
     }

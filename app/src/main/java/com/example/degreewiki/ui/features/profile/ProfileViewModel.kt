@@ -4,15 +4,11 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.degreewiki.data.repository.AuthRepository
 import com.example.degreewiki.data.repository.ProfileRepository
-import com.example.degreewiki.domain.model.SavedItem
-import com.example.degreewiki.domain.model.UserProfile
+import com.example.degreewiki.data.repository.ProfileState
+import com.example.degreewiki.data.repository.SaveProgramResult
+import com.example.degreewiki.data.repository.SavedProgramsState
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.stateIn
-import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -22,55 +18,21 @@ class ProfileViewModel @Inject constructor(
     private val authRepository: AuthRepository
 ) : ViewModel() {
 
-    private val _userProfile = MutableStateFlow<UserProfile?>(null)
-    val userProfile = _userProfile.asStateFlow()
+    val profileState: StateFlow<ProfileState> = profileRepository.profileState
+    val savedProgramsState: StateFlow<SavedProgramsState> =
+        profileRepository.savedProgramsState
 
-    private val _isLoading = MutableStateFlow(false)
-    val isLoading = _isLoading.asStateFlow()
-
-    private val _error = MutableStateFlow<String?>(null)
-    val error = _error.asStateFlow()
-
-    val savedItems: StateFlow<List<SavedItem>> = profileRepository.savedItems
-        .stateIn(
-            scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(5000),
-            initialValue = emptyList()
-        )
-
-    init {
-        loadData()
+    fun refresh() {
+        viewModelScope.launch { profileRepository.refresh() }
     }
 
-    fun loadData() {
+    fun removeSavedProgram(programId: String, onResult: (SaveProgramResult) -> Unit = {}) {
         viewModelScope.launch {
-            _isLoading.update { true }
-            _error.update { null }
-            try {
-                val profile = profileRepository.fetchProfile()
-                _userProfile.update { profile }
-                profileRepository.refreshSavedItems()
-            } catch (e: Exception) {
-                _error.update { e.message ?: "Failed to load profile data" }
-            } finally {
-                _isLoading.update { false }
-            }
-        }
-    }
-
-    fun removeSavedItem(id: String) {
-        viewModelScope.launch {
-            try {
-                profileRepository.removeSavedItem(id)
-            } catch (e: Exception) {
-                _error.update { e.message ?: "Failed to remove item" }
-            }
+            onResult(profileRepository.removeSavedProgram(programId))
         }
     }
 
     fun logout() {
-        viewModelScope.launch {
-            authRepository.logout()
-        }
+        viewModelScope.launch { runCatching { authRepository.logout() } }
     }
 }

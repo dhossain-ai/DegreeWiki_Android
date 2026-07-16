@@ -4,10 +4,13 @@ import androidx.navigation3.runtime.NavKey
 import kotlinx.serialization.Serializable
 
 @Serializable
-data object Main : NavKey
+data class Main(val initialTab: String = "HOME") : NavKey
 
 @Serializable
 data object Login : NavKey
+
+@Serializable
+data object SavedPrograms : NavKey
 
 @Serializable
 data class ProgramDetail(val id: String) : NavKey
