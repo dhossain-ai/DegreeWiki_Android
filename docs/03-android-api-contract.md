@@ -1,6 +1,52 @@
 # Android API Contract
 
-Last audited: 2026-07-14 (Bundle 13)
+Last audited: 2026-07-16 (Bundle 15)
+
+## Bundle 15 Profile And Saved Programs
+
+Android consumes the authenticated Bundle 14 web contract read-only from
+`W:\DegreeWiki\docs\11-mobile-api.md`.
+
+Protected Retrofit methods are marked internally and receive
+`Authorization: Bearer <Supabase access token>` at request time. The marker is removed before the
+request is sent. Public methods receive no bearer header.
+
+### `GET /api/mobile/me`
+
+Parses `{ ok, user, profile, savedSummary }` exactly. `profile` may be null. Android uses a genuine
+profile display name, then the validated auth display name, then email. It does not render user IDs,
+roles, provider metadata, tokens, student-profile fields, or invented preferences.
+
+### `GET /api/mobile/me/saved-items`
+
+Parses `{ ok, items }`. Only `entityType = "program"` is accepted into Android saved state. Each row
+retains both `savedItemId` and `entityId`, plus the documented Program summary fields.
+
+### `POST /api/mobile/me/saved-items`
+
+Sends only:
+
+```json
+{ "entityType": "program", "entityId": "<program-id>" }
+```
+
+The authenticated user ID is never sent by Android. Repeated local taps are serialized; an already
+saved Program does not create another request or duplicate local state.
+
+### `DELETE /api/mobile/me/saved-items/{savedItemId}`
+
+Deletion uses the server saved-item ID resolved from the shared `Program ID -> saved-item ID` map.
+Missing local mappings are treated as already removed. A successful response removes only the
+current account's cached row.
+
+### Errors And Session State
+
+- `401` is classified as session expiry, clears authenticated in-memory state, signs out the
+  Supabase session, and returns the UI to a login-capable state.
+- Other network/server failures use concise retry/save/remove copy; raw HTTP codes, response bodies,
+  and exception messages are not displayed.
+- Cached Saved Programs may remain visible during a network failure while the same session is
+  active.
 
 ## Bundle 13 Scholarships And Guides
 
@@ -115,6 +161,11 @@ This file records only contract surface verified from the Android repo and the c
 - Declared in `DegreeWikiApiService`
 - Not verified as used by current Android screens
 - Matching route file was not found in checked web repo source during this audit
+
+### Historical pre-Bundle-15 auth declarations
+
+The shapes below describe the obsolete scaffold that Bundle 15 replaced. They are retained only as
+audit history and are not the active Android contract.
 
 ### Auth-required endpoints declared in Android
 
@@ -338,7 +389,7 @@ Priority 3:
 
 - Android public detail screens are cache lookups over list payloads, not true detail endpoints.
 - Android declares `/api/mobile/bootstrap` and `/api/mobile/programs/search`, but matching route files were not found in the checked web repo source.
-- Android declares `/api/mobile/me` and `/api/mobile/me/saved-items`, but matching route files were not found in the checked web repo source.
-- The public web app supports authenticated save actions through `/api/saved-items/program`, which is a different route shape from the Android saved-items contract.
+- The old `/api/saved-items/program` web-page flow is not used by Android. Android now uses the
+  verified Bundle 14 `/api/mobile/me` contract exclusively.
 - `UniversityDto.countryId` is useful for cache joins, but Android must resolve it through cached countries because the university payload does not include country name.
 - `Json { ignoreUnknownKeys = true }` means additive backend fields will be ignored safely until Android DTOs are updated.

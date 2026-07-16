@@ -1,6 +1,21 @@
 # Android Design System
 
-Last updated: 2026-07-14 (Bundle 13)
+Last updated: 2026-07-16 (Bundle 15)
+
+## Bundle 15 Account And Saved Components
+
+- Logged-out Profile is benefit-first: account value, then the supported login action.
+- `AccountBenefitRow` uses a small icon and one direct benefit; it does not promise unsupported
+  providers or completed future tools.
+- `ProfileIdentityCard` shows a genuine display name when available and email otherwise.
+- `SavedProgramsSummaryCard` is the concise logged-in entry to the typed Saved Programs destination.
+- `ProgramSaveButton` uses `Save`, `Saved`, and a compact in-progress state. Repeated taps are
+  disabled while a request is active.
+- `LoginToSavePrompt` explains the cross-device benefit and never marks an anonymous Program saved.
+- `SavedProgramsEmptyState` uses the approved shortlist copy and an `Explore programs` action.
+- Saved Program cards reuse the Program card hierarchy where fields overlap and omit absent facts.
+- Save/remove errors are shown as short snackbars; API, database, cache, IDs, and HTTP terminology
+  never appear in student UI.
 
 ## Bundle 13 Public Content Components
 

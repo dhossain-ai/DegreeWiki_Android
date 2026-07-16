@@ -451,3 +451,71 @@ Modified: public DTOs, `DegreeWikiApiService`, `DataRepository`, three detail Vi
 Intentionally unchanged: web repo, Room schema/migration behavior, auth storage, network logging, dependencies, scholarships, guides, Fit Finder, and chat.
 
 Validation: `gradlew test`, `gradlew build`, and `gradlew lint` all passed. Manual QA: no emulator/device session was available; live list/detail API response shapes were inspected successfully. Known issue: list additions are not persisted, and official URLs are currently displayed as text rather than launched. Next: device QA and detail interaction polish.
+# 2026-07-16 — Bundle 15: Profile + Saved Programs
+
+- Read `W:\DegreeWiki\docs\11-mobile-api.md` read-only and implemented its exact authenticated
+  Profile/Saved Program contract in Android.
+- Restricted bearer injection to marked protected requests and redacted the authorization header.
+- Replaced obsolete Profile/Saved DTOs, domain models, repository behavior, and Room saved-item
+  shape with account-partitioned Saved Program data.
+- Added benefit-first logged-out Profile, genuine logged-in account summary, typed Login and Saved
+  Programs destinations, shared Save/Saved controls, login prompt, empty/error states, and logout.
+- Added focused tests for protected/public headers, profile nullability, saved response parsing,
+  Program ID mapping, duplicate collapse, logout clearing, 401 classification, login prompt, empty
+  saved list, and Save/Saved UI state.
+
+### Files Created
+
+- `app/src/main/java/com/example/degreewiki/ui/components/SavedProgramComponents.kt`
+- `app/src/main/java/com/example/degreewiki/ui/features/profile/SavedProgramsScreen.kt`
+- `app/src/test/java/com/example/degreewiki/data/network/AuthInterceptorTest.kt`
+- `app/src/test/java/com/example/degreewiki/data/network/AuthenticatedDtoParsingTest.kt`
+- `app/src/test/java/com/example/degreewiki/data/repository/SavedProgramsStateTest.kt`
+- `app/src/androidTest/java/com/example/degreewiki/ui/components/SavedProgramComponentsTest.kt`
+
+### Files Modified
+
+- authenticated network/session, DTO, repository, domain, Room, navigation, auth, Home, Programs,
+  Program detail, Profile, Gradle test dependency, and all Bundle 15 documentation files
+
+### Files Deleted
+
+- none
+
+### Intentionally Not Changed
+
+- no web repo files or backend endpoints
+- no Saved Universities, Countries, Scholarships, or Guides
+- no Compare, Fit Finder, or Chat
+- no registration or social login
+- no offline mutation queue
+- no unrelated public-screen redesign
+- no public Program, University, Country, Scholarship, or Guide cache deletion on logout
+
+### Validation Results
+
+- focused `:app:testDebugUnitTest :app:compileDebugAndroidTestKotlin`: passed
+- `.\gradlew.bat test`: passed
+- `.\gradlew.bat build`: passed
+- `.\gradlew.bat lint`: passed
+- connected tests: not run; focused Compose coverage compiled and no emulator matrix was required
+- final validation emitted the existing AndroidX Security deprecation warnings and non-failing
+  native symbol-strip notices
+
+### Manual QA
+
+- Static/code-path QA completed for logged-out benefit flow, typed Login return, profile field
+  fallback, shared save state, saved-item deletion mapping, account partitioning, logout clearing,
+  session expiry, empty/error copy, and public-request isolation.
+- Live account/device QA was not run in this pass; production credentials were not available to the
+  automated environment.
+
+### Known Issues
+
+- Existing encrypted-session storage uses deprecated AndroidX Security APIs and still emits the
+  pre-existing build warnings.
+- Live authenticated production behavior still requires device QA with a real test account.
+
+### Next Recommended Bundle
+
+- Bundle 16 — Fit Finder, only after its backend-scored Program contract is verified.

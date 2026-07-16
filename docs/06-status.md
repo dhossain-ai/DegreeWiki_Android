@@ -1,6 +1,38 @@
 # Android Status
 
-Last updated: 2026-07-15
+Last updated: 2026-07-16
+
+## Bundle 15 Status — Profile + Saved Programs
+
+- Status: implemented and validated.
+- Uses the production Bundle 14 authenticated mobile contract without modifying the web repo.
+- Protected Retrofit calls receive the current Supabase bearer token only when explicitly marked;
+  public browse/detail calls remain unauthenticated and HTTP logs redact `Authorization`.
+- Profile handles loading, logged out, session expired, real profile, null profile, and retryable
+  network failure without invented identity or raw technical errors.
+- Logged-out Profile is benefit-first and opens the existing email/password Login destination.
+  Registration is intentionally absent because Android does not implement it.
+- Logged-in Profile shows genuine identity/email, Saved Programs count and entry, deferred Fit
+  Finder context, and logout.
+- Saved Programs supports authenticated list/save/delete, Program ID to saved-item ID mapping,
+  duplicate-safe mutations, typed detail navigation, retry, empty state, and remove actions.
+- Home Program cards, Programs browse cards, and Program detail share confirmed Save/Saved state.
+  Anonymous taps show a login prompt and never display a false saved state.
+- Room database version 4 partitions saved summaries by account through explicit `MIGRATION_3_4`.
+  Logout/session expiry clears authenticated state while public caches remain intact.
+- Saved Universities, Countries, Scholarships, Guides, Compare, Fit Finder, Chat, fake social
+  login, and offline mutation queues remain excluded.
+
+## Bundle 15 Validation
+
+- Focused `:app:testDebugUnitTest :app:compileDebugAndroidTestKotlin`: passed.
+- `.\gradlew.bat test`: passed.
+- `.\gradlew.bat build`: passed.
+- `.\gradlew.bat lint`: passed.
+- Connected tests were not run; focused Compose tests compile and no critical interaction required
+  a broader emulator matrix.
+- Final validation emitted only the existing AndroidX Security deprecation warnings and native
+  symbol-strip notices; neither failed validation.
 
 ## Bundle 13 Status — Scholarships + Guides Android
 
@@ -131,9 +163,9 @@ Last updated: 2026-07-15
 - Current screen copy and hierarchy still reflect developer-MVP patterns and have not yet been redesigned in code.
 - Browse cards need shorter text, better comparison facts, and stronger visual hierarchy.
 - Rich detail sections need clearer structure and actionable official links.
-- Saved-items product UX, Fit Finder, and Chat remain future work.
+- Fit Finder and Chat remain future work.
 - The open UX decisions in `docs/10-android-mobile-ux-blueprint.md` require resolution during the relevant implementation bundles.
 
 ## Next Recommended Bundle
 
-Bundle 14 — Profile/Saved Items. Bundle 13 has passed its live production QA gate.
+Bundle 16 — Fit Finder using a verified backend-scored Program contract.

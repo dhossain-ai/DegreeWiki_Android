@@ -1,6 +1,23 @@
 # Android Architecture
 
-Last audited: 2026-07-14 (Bundle 13)
+Last audited: 2026-07-16 (Bundle 15)
+
+## Bundle 15 Authenticated Account Architecture
+
+- `AuthRepository` remains the single Supabase email/password session owner.
+- `AccessTokenProvider` reads the current Supabase access token only when OkHttp processes a
+  Retrofit method marked with `X-DegreeWiki-Authenticated: true`.
+- `AuthInterceptor` removes that internal marker before transmission and adds a bearer header only
+  to protected mobile routes. Public browse/detail requests remain unauthenticated.
+- HTTP logging redacts `Authorization`; tokens are not copied into ViewModel state or UI.
+- `ProfileRepository` is the app-wide source of truth for `/api/mobile/me`, saved Programs, the
+  Program ID to saved-item ID map, pending mutations, session expiry, and safe student-facing
+  failures.
+- Home, Programs, Program detail, Profile, and Saved Programs observe the same saved state, so
+  confirmed save/unsave changes are reflected across visible Program surfaces.
+- `MIGRATION_3_4` replaces only the obsolete `saved_items` table. Saved summaries are partitioned by
+  `ownerUserId`, uniquely keyed per account and Program, and cleared from active state on logout.
+- Public Program, University, Country, Scholarship, and Guide tables are not cleared on logout.
 
 ## High-Level Shape
 
@@ -33,13 +50,16 @@ Verified navigation uses `androidx.navigation3`:
   - `CountryDetail(id: String)`
   - `ScholarshipDetail(slug: String)`
   - `GuideDetail(slug: String)`
+  - `SavedPrograms`
+- Auth destination:
+  - `Login`
 - Home-only browse destinations:
   - `Scholarships`
   - `Guides`
 
 Important limits:
 
-- `Login` nav key exists but is not used in the root nav graph.
+- `Login` and `SavedPrograms` are typed root destinations and do not add bottom tabs.
 - Main tab switching is local UI state inside `MainScreen`, not route-based navigation.
 - Chat and Fit Finder are not part of current navigation.
 
@@ -76,9 +96,7 @@ Patterns in use:
 - `collectAsStateWithLifecycle()` in most active Compose screens
 - `rememberSaveable` for transient UI state such as current tab and form fields
 
-Observed inconsistency:
-
-- `ProfileScreen` uses plain `collectAsState()` instead of lifecycle-aware collection.
+Profile, Saved Programs, and active browse/detail surfaces use lifecycle-aware collection.
 
 ## Repository Layer
 
@@ -87,7 +105,8 @@ Observed inconsistency:
 - `AuthRepository`
   auth state, login, logout
 - `ProfileRepository`
-  profile fetch, saved-items refresh, saved-item delete
+  authenticated profile state, account-partitioned saved Program cache, save/unsave mutations,
+  session-expiry handling, and shared saved indicators
 
 Observations:
 
@@ -123,13 +142,15 @@ Room database tables:
 - `programs`
 - `universities`
 - `countries`
-- `saved_items`
+- `saved_items` (authenticated Saved Program summaries partitioned by owner)
 - `scholarships` (list summaries only)
 - `guides` (list summaries only)
 
 Notes:
 
-- DB version is `3`
+- DB version is `4`
+- `MIGRATION_3_4` replaces the pre-contract saved-item table with the verified Saved Program shape
+  and an account/program unique index.
 - `MIGRATION_2_3` creates the Scholarship and Guide list-cache tables without dropping Program,
   University, Country, saved-item, or auth-adjacent data.
 - Rich Scholarship and Guide details remain in ViewModel memory. Their ViewModels observe the
@@ -146,8 +167,8 @@ Implications:
 
 - Retrofit interface: `DegreeWikiApiService`
 - JSON parser: kotlinx serialization `Json`
-- OkHttp auth interceptor attaches Supabase bearer token when available
-- OkHttp logging interceptor is enabled at `BODY` level for all builds in current code
+- OkHttp auth interceptor attaches Supabase bearer tokens only to explicitly protected methods
+- OkHttp logging is enabled at `BODY` level and redacts `Authorization`
 
 ## Auth Layer
 

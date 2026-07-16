@@ -1,6 +1,23 @@
 # Android Coding Standards
 
-Last audited: 2026-07-09
+Last audited: 2026-07-16
+
+## Bundle 15 Authenticated Request And Saved-State Rules
+
+- Mark only protected Retrofit methods for bearer injection; never authenticate public routes by
+  default.
+- Read the access token at request time from the current Supabase session. Never hardcode, log,
+  display, or persist a token outside the existing encrypted session manager.
+- Redact `Authorization` in all OkHttp logging.
+- Treat `401` as an expired/logged-out session, not as a raw UI error.
+- Never send a client-selected user ID to authenticated account endpoints.
+- Keep both Program ID and saved-item ID. Program UI keys by Program ID; DELETE keys by saved-item
+  ID.
+- Serialize save mutations, disable repeat taps while pending, and preserve idempotency locally.
+- Partition authenticated Room rows by owner and clear active saved state on logout/account change.
+- Do not clear public browse caches when authentication changes.
+- Use exact documented profile fields and omit unsupported identity, role, preference, and student
+  metadata.
 
 ## Standards Already Followed
 

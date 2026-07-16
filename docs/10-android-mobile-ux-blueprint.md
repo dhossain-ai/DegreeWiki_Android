@@ -1,6 +1,6 @@
 # DegreeWiki Android Mobile UX Blueprint
 
-Last updated: 2026-07-14 (Bundle 13 implementation notes)
+Last updated: 2026-07-16 (Bundle 15 implementation notes)
 
 ## 1. Purpose
 
@@ -111,7 +111,7 @@ Each card should have one clear destination and a concise visual identity. Avoid
 - Supporting copy: “Answer a few questions and find programs that match your goals.”
 - Later login explanation: “Sign in to save your Fit Finder results.”
 
-The CTA may appear as clearly deferred guidance, but must not imply a working Fit Finder before Bundle 15.
+The CTA may appear as clearly deferred guidance, but must not imply a working Fit Finder before Bundle 16.
 
 ### F. Featured Content
 
@@ -404,15 +404,15 @@ All content must be real. An entry card must not imply a live destination before
 
 - Add Android public list/detail experiences using the verified API.
 
-### Bundle 14 — Profile/Saved Items
+### Bundle 15 — Profile/Saved Programs Android
 
 - Add benefit-led account UX, saved items, and dashboard behavior.
 
-### Bundle 15 — Fit Finder
+### Bundle 16 — Fit Finder
 
 - Add a native, login-aware Fit Finder flow using backend-scored real programs.
 
-### Bundle 16 — Chat
+### Bundle 17 — Chat
 
 - Add contextual Chat through the backend gateway; do not make it a bottom tab.
 
@@ -446,6 +446,22 @@ All content must be real. An entry card must not imply a live destination before
   and cautious verification presentation. No WebView or executable markup is involved.
 - Scholarship and Guide list summaries are cached in Room; rich detail remains in ViewModel memory
   with cached-summary fallback. Student copy describes saved information without API/cache jargon.
+
+## Bundle 15 Implementation Notes
+
+- Logged-out Profile leads with Save/shortlist/cross-device benefits and opens the existing real
+  email/password login as a typed destination. Registration remains omitted because Android has no
+  implemented registration flow.
+- Logged-in Profile shows only a genuine display name or email, account email, Saved Programs count,
+  Saved Programs entry, a clearly deferred Fit Finder note, and logout.
+- Saved Programs is a typed destination outside bottom navigation with real Program summaries,
+  detail navigation, remove actions, retry, and the approved empty state.
+- Home featured Program cards, Programs browse cards, and Program detail use one shared confirmed
+  Save/Saved state. Anonymous save attempts show the login-to-save prompt.
+- Saved rows are account-partitioned in Room. Logout/session expiry clears authenticated state
+  without deleting public browse caches. Offline mutation queues were intentionally not added.
+- Missing profile and Program fields are omitted. No IDs, tokens, roles, providers, fake avatars,
+  fake display names, Saved non-Program entities, Compare, Fit Finder, or Chat behavior was added.
 
 ## Bundle 10 Implementation Notes
 

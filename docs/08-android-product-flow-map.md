@@ -1,6 +1,32 @@
 # Android Product Flow Map
 
-Last updated: 2026-07-14 (Bundle 13)
+Last updated: 2026-07-16 (Bundle 15)
+
+## Bundle 15 Implemented Account And Shortlist Flow
+
+```text
+Profile tab
+  -> logged out: benefits -> typed Login -> existing Supabase email/password flow
+  -> logged in: genuine identity + Saved Programs count
+      -> typed SavedPrograms
+          -> Program detail
+          -> remove Program
+          -> empty state -> Main shell opened on Programs
+
+Program card / Program detail
+  -> logged out Save -> LoginToSavePrompt -> typed Login
+  -> logged in Save/Unsave -> authenticated mobile API
+      -> shared Program ID / saved-item ID state
+      -> Home + Programs + detail + Saved Programs update together
+
+401 / expired session
+  -> clear authenticated saved state
+  -> Supabase logout
+  -> logged-out/session-expired Profile or Login prompt
+```
+
+Saved Programs is not a bottom tab. The five-item shell remains unchanged. Public browsing remains
+available without an account.
 
 ## Purpose And Design Source
 
@@ -61,7 +87,7 @@ Home
   -> Programs browse card -> Programs list
   -> Universities browse card -> Universities list -> University detail
   -> Countries browse card -> Countries list -> Country detail
-  -> Fit Finder CTA -> deferred until Bundle 15
+  -> Fit Finder CTA -> deferred until Bundle 16
   -> Scholarships card -> Scholarships list -> Scholarship detail
   -> Guides card -> Study guides list -> Guide detail -> Related guide detail
 ```
@@ -127,9 +153,9 @@ Login is required only where account persistence or protected backend behavior r
 
 - Public browsing and detail reading: no login.
 - Profile benefits and login entry: public.
-- Saving programs and cross-device saved items: login-gated when implemented.
+- Saving programs and cross-device Saved Programs: implemented and login-gated.
 - Persistent Fit Finder results: login-gated when implemented.
-- Fit Finder entry may be visible publicly, but must not imply the flow works before Bundle 15.
+- Fit Finder entry may be visible publicly, but must not imply the flow works before Bundle 16.
 - Whether an anonymous Fit Finder trial is possible remains an open backend/product decision.
 - Compare may be public and local or account-backed; this remains an open decision.
 
@@ -157,6 +183,6 @@ Profile should explain student benefits before or alongside the supported email/
 3. Bundle 11 — Search + Filter UX (implemented)
 4. Bundle 12 — Scholarships/Guides API in the web repo
 5. Bundle 13 — Scholarships/Guides Android
-6. Bundle 14 — Profile/Saved Items
-7. Bundle 15 — Fit Finder
-8. Bundle 16 — contextual Chat
+6. Bundle 15 — Profile/Saved Programs Android using the Bundle 14 web APIs
+7. Bundle 16 — Fit Finder
+8. Bundle 17 — contextual Chat
